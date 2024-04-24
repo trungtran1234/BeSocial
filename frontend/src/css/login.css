@@ -1,0 +1,59 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+    background-color: #e3e3e3; /* Light background color */
+  }
+  
+  .login-box {
+    background-color: white;
+    padding: 80px;
+    border-radius: 10px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
+    max-width: 700px; /* Max width to avoid stretching */
+    text-align: center;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-field {
+    width: 100%; /* Full width for inputs */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 5px;
+  }
+  
+  .options {
+    display: flex;
+    justify-content: space-between; /* Space out remember me and forgot password */
+    align-items: center; /* Align vertically */
+  }
+  
+  .login-button {
+    background-color: #000; /* Black background for button */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners for button */
+    cursor: pointer; /* Pointer cursor */
+    transition: all 0.3s;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .login-button:hover {
+    background-color: #767676; /* Darker shade on hover */
+  }
+
+  .input-label {
+    font-size: 20px; 
+    flex: 1;
+    text-align: left;
+    margin-bottom: 3px;
+    margin-top: 15px;
+  }
