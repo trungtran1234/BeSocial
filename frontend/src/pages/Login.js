@@ -6,11 +6,11 @@ const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [token, setToken] = useState(null);
   const navigate = useNavigate();
+  
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post('http://localhost:5000/login', {
         username,
@@ -18,12 +18,13 @@ const LoginForm = () => {
       });
 
       if (response.status === 200) {
+        const token = response.data.token; //this gets token generated from backend
+        localStorage.setItem('authToken', token); //store it in local storage
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; //set token in header
         navigate('/');
-        setToken(response.data.token);
-        setMessage('Login successful');
       }
     } catch (error) {
-      setMessage('Error logging in');
+      console.error(error);
     }
   };
 
@@ -59,7 +60,7 @@ const LoginForm = () => {
         </form>
         <p>
           Don't have an account?{' '}
-          <Link to="/register">Sign up</Link> {/* Link to registration page */}
+          <Link to="/register">Sign up</Link>
         </p>
       </div>
     </div>

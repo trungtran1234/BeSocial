@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 const RegistrationForm = () => {
@@ -18,11 +18,14 @@ const RegistrationForm = () => {
       });
 
       if (response.status === 201) {
+        const token = response.data.token; 
+        localStorage.setItem('authToken', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         navigate('/')
         setMessage('User registered successfully');
       }
     } catch (error) {
-      setMessage('Error registering user');
+      setMessage('Error registering user!');
     }
   };
 

@@ -10,8 +10,8 @@
     background-color: white;
     padding: 80px;
     border-radius: 10px;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
-    max-width: 700px; /* Max width to avoid stretching */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+    max-width: 700px;
     text-align: center;
   }
   
@@ -21,33 +21,33 @@
   }
   
   .input-field {
-    width: 100%; /* Full width for inputs */
+    width: 100%;
     padding-top: 10px;
     padding-bottom: 10px;
-    border: 1px solid #ccc; /* Light border for inputs */
+    border: 1px solid #ccc;
     border-radius: 5px;
   }
   
   .options {
     display: flex;
-    justify-content: space-between; /* Space out remember me and forgot password */
-    align-items: center; /* Align vertically */
+    justify-content: space-between; 
+    align-items: center;
   }
   
   .login-button {
-    background-color: #000; /* Black background for button */
-    color: white; /* White text */
-    padding: 10px 20px; /* Padding for the button */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners for button */
-    cursor: pointer; /* Pointer cursor */
+    background-color: #000;
+    color: white; 
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 5px;
+    cursor: pointer;
     transition: all 0.3s;
     margin-top: 20px;
     margin-bottom: 30px;
   }
   
   .login-button:hover {
-    background-color: #767676; /* Darker shade on hover */
+    background-color: #767676;
   }
 
   .input-label {

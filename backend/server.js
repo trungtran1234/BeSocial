@@ -32,20 +32,27 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 })
 
-const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization'];
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.SECRET_KEY;
+
+const authenticateToken = (req, res, next) => { //middleware to authenticate token
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
     if (!token) {
-        return res.status(401).send('Access denied');
+        return res.status(401).send('Access denied. No token provided.');
     }
 
-    jwt.verify(token, secretKey, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
         if (err) {
-            return res.status(403).send('Invalid token');
+            return res.status(403).send('Invalid token.');
         }
+
         req.userId = decoded.userId;
         next();
     });
 };
+
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
@@ -58,14 +65,13 @@ app.post('/register', async (req, res) => {
             if (err) {
                 res.status(500).send('Error registering user');
             } else {
-                res.status(201).send('User registered successfully');
+                const userId = result.insertId; //new user id (cuz new user)
+                const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+                res.status(201).send({ token });
             }
         }
     );
 });
-
-const jwt = require('jsonwebtoken');
-const secretKey = process.env.SECRET_KEY;
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -80,14 +86,16 @@ app.post('/login', (req, res) => {
             const match = await bcrypt.compare(password, user.password);
 
             if (match) {
-                const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
-                res.status(200).send({ token });
+                const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });//generate token
+                return res.status(200).send({ token }); //send token to frontend
             } else {
-                res.status(401).send('Incorrect password');
+                return res.status(401).send('Incorrect password');
             }
         }
     });
 });
+
+
 
 app.get('/', authenticateToken, (req, res) => {
     res.send('This is a protected endpoint');
