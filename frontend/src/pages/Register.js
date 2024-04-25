@@ -18,21 +18,33 @@ const RegistrationForm = () => {
       });
 
       if (response.status === 201) {
-        const token = response.data.token; 
+        const token = response.data.token;
         localStorage.setItem('authToken', token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        navigate('/')
+        navigate('/');
         setMessage('User registered successfully');
       }
     } catch (error) {
-      setMessage('Error registering user!');
+      if (error.response) {
+        const statusCode = error.response.status;
+        let errorMessage = 'Error registering user';
+        if (statusCode === 500) {
+          errorMessage = 'Username already exists';
+        }
+        setMessage(errorMessage);
+        setTimeout(() => {
+          setMessage('');
+        }, 4000);
     }
+  }
   };
-
   return (
     <div className="login-container">
       <div className="login-box">
         <h1>Sign Up</h1>
+        {message && (
+          <div className="error-message">{message}</div> 
+        )}
         <form onSubmit={handleRegister}>
           <div className="form-group">
             <label className="input-label">Username</label>
@@ -57,7 +69,7 @@ const RegistrationForm = () => {
             />
           </div>
           <button type="submit" className="login-button">Sign up</button>
-          
+
         </form>
         <p>
           Already have an account?{' '}
