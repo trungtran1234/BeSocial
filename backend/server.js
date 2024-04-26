@@ -35,7 +35,8 @@ app.listen(port, () => {
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
 
-const authenticateToken = (req, res, next) => { //middleware to authenticate token
+//middleware to authenticate token
+const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -53,7 +54,7 @@ const authenticateToken = (req, res, next) => { //middleware to authenticate tok
     });
 };
 
-
+//register
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -73,6 +74,7 @@ app.post('/register', async (req, res) => {
     );
 });
 
+//login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -97,9 +99,161 @@ app.post('/login', (req, res) => {
     });
 });
 
-
-
+//home page
 app.get('/', authenticateToken, (req, res) => {
-    res.send('This is a protected endpoint');
+    res.send('This the home page');
 });
 
+//post events
+app.post('/events', authenticateToken, (req, res) => {
+    const { title, description, location, capacity, category, startTime, endTime } = req.body;
+
+    if (!title || !description || !location || !capacity || !category || !startTime || !endTime) {
+        return res.status(400).send('All fields are required.');
+    }
+    //check start time is before end time
+    if (new Date(startTime) >= new Date(endTime)) {
+        return res.status(400).send('Start time must be before end time.');
+    }
+
+    const eventData = {
+        title,
+        description,
+        location,
+        capacity,
+        category,
+        start_time: startTime,
+        end_time: endTime,
+        host_user_id: req.userId,
+    };
+
+    db.query(
+        'INSERT INTO events SET ?',
+        eventData,
+        (err, result) => {
+            if (err) {
+                console.error('Error creating event:', err);
+                return res.status(500).send('Error creating event');
+            }
+            return res.status(201).send({ eventId: result.insertId, message: 'Event created successfully' });
+        }
+    );
+});
+
+//get eventrs
+app.get('/events', authenticateToken, (req, res) => {
+    const { category, location, startTime, endTime } = req.query;
+
+    let query = 'SELECT * FROM events WHERE 1=1';
+    const queryParams = [];
+
+    if (category) {
+        query += ' AND category = ?';
+        queryParams.push(category);
+    }
+
+    if (location) {
+        query += ' AND location = ?';
+        queryParams.push(location);
+    }
+
+    if (startTime) {
+        query += ' AND start_time >= ?';
+        queryParams.push(startTime);
+    }
+
+    if (endTime) {
+        query += ' AND end_time <= ?';
+        queryParams.push(endTime);
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error retrieving events:', err);
+            return res.status(500).send('Error retrieving events');
+        }
+
+        return res.status(200).send(results);
+    });
+});
+
+//update event
+app.put('/events/:id', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+    const { title, description, location, capacity, category, startTime, endTime } = req.body;
+
+    db.query(
+        'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
+        [eventId, req.userId],
+        (err, results) => {
+            if (err) {
+                console.error('Error finding event:', err);
+                return res.status(500).send('Error finding event');
+            }
+
+            if (results.length === 0) {
+                return res.status(404).send('Event not found or you are not the host');
+            }
+
+            if (new Date(startTime) >= new Date(endTime)) {
+                return res.status(400).send('Start time must be before end time.');
+            }
+
+            const updatedData = {
+                title,
+                description,
+                location,
+                capacity,
+                category,
+                start_time: startTime,
+                end_time: endTime,
+            };
+
+            db.query(
+                'UPDATE events SET ? WHERE id = ?',
+                [updatedData, eventId],
+                (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error updating event:', updateErr);
+                        return res.status(500).send('Error updating event');
+                    }
+
+                    return res.status(200).send({ message: 'Event updated successfully' });
+                }
+            );
+        }
+    );
+});
+
+//delete event
+app.delete('/events/:id', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+
+    db.query(
+        'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
+        [eventId, req.userId],
+        (err, results) => {
+            if (err) {
+                console.error('Error finding event:', err);
+                return res.status(500).send('Error finding event');
+            }
+
+            if (results.length === 0) {
+                return res.status(404).send('Event not found or you are not the host');
+            }
+
+            db.query(
+                'DELETE FROM events WHERE id = ?',
+                [eventId],
+                (deleteErr) => {
+                    if (deleteErr) {
+                        console.error('Error deleting event:', deleteErr);
+                        return res.status(500).send('Error deleting event');
+                    }
+
+                    return res.status(200).send({ message: 'Event deleted successfully' });
+                }
+            );
+        }
+    );
+});
