@@ -83,8 +83,6 @@ app.post('/login', (req, res) => {
             res.status(500).send('Database error');
         } else if (results.length === 0) {
             res.status(401).send('User not found');
-        } else if (results[0].password != password) {
-            res.status(402).send('Incorrect password');
         } else {
             const user = results[0];
             const match = await bcrypt.compare(password, user.password);
