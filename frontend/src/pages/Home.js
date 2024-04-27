@@ -5,7 +5,7 @@ import EventForm from '../components/EventForm';
 import '../css/homepage.css';
 
 function Homepage({ token: initialToken }) {
-  const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
+    const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
   const [events, setEvents] = useState([]);
   const [showEventForm, setShowEventForm] = useState(false);
 
