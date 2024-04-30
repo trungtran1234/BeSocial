@@ -35,11 +35,21 @@ function Homepage({ token: initialToken }) {
     fetchEvents();
   };
 
+  const handleLogout = () => {
+    // Clear the authentication token from local storage
+    localStorage.removeItem('authToken');
+    // Redirect to the login page
+    window.location.href = '/login';
+  };
+  const handleDeleteEvent = async (eventId) => {
+    // Filter out the deleted event from the events array
+    setEvents(events.filter(event => event.id !== eventId));
+  };
   return (
     <div className="event-wall">
       <h1>BeSocial</h1>
       <button onClick={() => setShowEventForm(true)}>Create New Event</button>
-
+      <button onClick={handleLogout}>Logout</button> {/* Add the logout button */}
       {showEventForm && (
         <div className="popup">
           <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
@@ -49,7 +59,7 @@ function Homepage({ token: initialToken }) {
       {events.length === 0 ? (
         <p>No events posted yet.</p>
       ) : (
-        events.map((event) => <EventItem key={event.id} event={event} />)
+        events.map((event) => <EventItem key={event.id} event={event} onDelete={handleDeleteEvent}/>)
       )}
     </div>
   );
