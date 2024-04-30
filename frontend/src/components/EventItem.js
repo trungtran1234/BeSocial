@@ -18,7 +18,7 @@ import '../css/event_item.css';
         <h3>{event.title}</h3>
         <p>{event.description}</p>
         <p>
-          <strong>Location:</strong> {event.location}
+          <strong>Location: </strong> {event.location}
         </p>
         <p>
           <strong>Capacity:</strong> {event.capacity}

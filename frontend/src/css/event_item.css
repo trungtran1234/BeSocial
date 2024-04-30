@@ -1,0 +1,9 @@
+.event-item {
+    background-color: #d4c6c6;
+    padding: 1rem;
+    border-radius: 1rem;
+    max-width: 25%;
+    max-height: 35%;
+    margin: auto;
+    position: relative;
+}
