@@ -1,0 +1,56 @@
+.taskbarContainer {
+    height:6vh;
+    width: 100vw;
+    font-size: 1vw;
+    background-color: rgb(129, 120, 113);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logoutButton {
+    height:80%;
+    width: 90%;
+    font-size: 1em;
+    
+}
+
+.innerTaskBar{
+    background-color: rgb(197, 182, 170);
+    height: 90%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.taskBarLeft{
+    height: 100%;
+    width: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.taskBarCenter{
+    height: 100%;
+    width: 67%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 3%;
+    padding-left: 3%;
+    
+}
+ 
+.taskBarRight{
+    height: 100%;
+    width: 8%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    padding-right: 0.5%;
+    
+    
+}
