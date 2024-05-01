@@ -50,12 +50,13 @@ function EventWall({ token: initialToken }) {
             <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
           </div>
         )}
-  
-        {events.length === 0 ? (
-          <p>No events posted yet.</p>
-        ) : (
-          events.map((event) => <EventItem key={event.id} event={event} onDelete={handleDeleteEvent}/>)
-        )}
+        <div className="eventsListed">
+          {events.length === 0 ? (
+            <p>No events posted yet.</p>
+          ) : (
+            events.map((event) => <EventItem key={event.id} event={event} onDelete={handleDeleteEvent}/>)
+          )}
+        </div>
       </div>
     );
   }

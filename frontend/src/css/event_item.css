@@ -1,9 +1,9 @@
 .event-item {
-    background-color: #d4c6c6;
+    background-color: #998585;
     padding: 1rem;
+    margin-bottom: 1rem;
     border-radius: 1rem;
-    max-width: 25%;
-    max-height: 35%;
-    margin: auto;
+    width: 15%;
+    height: 25%;
     position: relative;
 }
