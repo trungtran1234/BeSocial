@@ -49,7 +49,7 @@ function Homepage({ token: initialToken }) {
       {events.length === 0 ? (
         <p>No events posted yet.</p>
       ) : (
-        events.map((event) => <EventItem key={event.id} event={event} />)
+        events.map((event) => <EventItem event={event} />)
       )}
     </div>
   );
