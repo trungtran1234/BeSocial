@@ -2,7 +2,7 @@
     height:6vh;
     width: 100vw;
     font-size: 1vw;
-    background-color: rgb(89, 89, 99);
+    background-color: rgb(129, 120, 113);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,7 +30,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgb(224, 89, 89);
+    
 }
 
 .taskBarCenter{
@@ -41,7 +41,7 @@
     align-items: center;
     padding-right: 3%;
     padding-left: 3%;
-    background-color: rgb(43, 153, 39);
+    
 }
  
 .taskBarRight{
@@ -51,6 +51,6 @@
     justify-content: right;
     align-items: center;
     padding-right: 0.5%;
-    background-color: rgb(36, 79, 134);
+    
     
 }

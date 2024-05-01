@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import '../css/register.css';
 
 
 const RegistrationForm = () => {
@@ -8,6 +9,7 @@ const RegistrationForm = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -39,17 +41,20 @@ const RegistrationForm = () => {
   }
   };
   return (
-    <div className="login-container">
-      <div className="login-box">
+    <div className="register-container">
+      <div className = "register-logo">
+          Register Now!
+      </div>
+      <div className="register-box">
         <h1>Sign Up</h1>
         {message && (
-          <div className="error-message">{message}</div> 
+          <div className="register-error-message">{message}</div> 
         )}
         <form onSubmit={handleRegister}>
-          <div className="form-group">
-            <label className="input-label">Username</label>
+          <div className="register-form-group">
+            <label className="register-input-label">Username</label>
             <input
-              className="input-field"
+              className="register-input-field"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -57,10 +62,10 @@ const RegistrationForm = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label className="input-label">Password</label>
+          <div className="register-form-group">
+            <label className="register-input-label">Password</label>
             <input
-              className="input-field"
+              className="register-input-field"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +73,7 @@ const RegistrationForm = () => {
               required
             />
           </div>
-          <button type="submit" className="login-button">Sign up</button>
+          <button type="submit" className="register-login-button">Sign up</button>
 
         </form>
         <p>

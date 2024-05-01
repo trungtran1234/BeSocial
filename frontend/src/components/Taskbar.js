@@ -24,11 +24,7 @@ function Taskbar({ token: initialToken }) {
                     <div>[Insert Logo]</div>
                 </div>
                 <div className="taskBarCenter">
-                    <div>[Insert Button]</div>
-                    <div>[Insert Button]</div>
-                    <div>[Insert Button]</div>
-                    <div>[Insert Button]</div>
-                    <div>[Insert Button]</div>
+                    
                 </div>
                 <div className="taskBarRight">
                     <button className="logoutButton" onClick={handleLogout}>Logout</button>
