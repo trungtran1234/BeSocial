@@ -1,48 +1,6 @@
-.event-wall {
+.homeContainer {
     text-align: center;
-    padding: 20px;
-  }
-  
-  .event-wall h1 {
-    color: #333;
-  }
-  
-  .event-wall button {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .event-wall button:hover {
-    background-color: #218838;
-  }
-  
-  .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 20px;
-    z-index: 1000;
-  }
-  
-  .popup .close {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .popup .close:hover {
-    background-color: #c82333;
-  }
+    
+}
+
   

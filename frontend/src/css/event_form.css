@@ -1,6 +1,6 @@
 .event-form {
-    background-color: #ffffff;
-    padding: 20px;
+    background-color: #549797;
+    padding: 2.8rem;
     border-radius: 8px;
     max-width: 500px;
     margin: auto;
@@ -8,7 +8,7 @@
   }
   
   .event-form h2 {
-    color: #333;
+    color: #000000;
     margin-bottom: 20px;
   }
   
@@ -39,7 +39,7 @@
   }
   
   .event-form button[type="button"] {
-    background-color: #f44336;
+    background-color: #ff1100;
     color: white;
   }
   

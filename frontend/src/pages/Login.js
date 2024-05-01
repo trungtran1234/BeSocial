@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import '../css/login.css';
+
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -42,16 +43,19 @@ const LoginForm = () => {
   };
   return (
     <div className="login-container">
+      <div className = "login-logo">
+          What are you waiting for?
+      </div>
       <div className="login-box">
         <h1>Login</h1>
         {message && (
           <div className="error-message">{message}</div>
         )}
         <form onSubmit={handleLogin}>
-          <div className="form-group">
+          <div className="login-form-group">
             <label className="input-label">Username</label>
             <input
-              className="input-field"
+              className="login-input-field"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -59,10 +63,10 @@ const LoginForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="login-form-group">
             <label className="input-label">Password</label>
             <input
-              className="input-field"
+              className="login-input-field"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
