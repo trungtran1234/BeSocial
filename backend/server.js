@@ -103,7 +103,7 @@ app.get('/', authenticateToken, (req, res) => {
 });
 
 //post events
-app.post('/events', authenticateToken, (req, res) => {
+app.post('/event_walls', authenticateToken, (req, res) => {
     const { title, description, location, capacity, category, startTime, endTime } = req.body;
 
     if (!title || !description || !location || !capacity || !category || !startTime || !endTime) {
@@ -174,6 +174,43 @@ app.get('/events', authenticateToken, (req, res) => {
         return res.status(200).send(results);
     });
 });
+//get user's events
+app.get('/user_events', authenticateToken, (req, res) => {
+    const { category, location, startTime, endTime } = req.query;
+
+    let query = 'SELECT * FROM events WHERE host_user_id = ?';
+    const queryParams = [req.userId]; // Use req.userId to filter events by user's ID
+
+    if (category) {
+        query += ' AND category = ?';
+        queryParams.push(category);
+    }
+
+    if (location) {
+        query += ' AND location = ?';
+        queryParams.push(location);
+    }
+
+    if (startTime) {
+        query += ' AND start_time >= ?';
+        queryParams.push(startTime);
+    }
+
+    if (endTime) {
+        query += ' AND end_time <= ?';
+        queryParams.push(endTime);
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error retrieving user events:', err);
+            return res.status(500).send('Error retrieving user events');
+        }
+
+        return res.status(200).send(results);
+    });
+});
+
 
 //update event
 app.put('/events/:id', authenticateToken, (req, res) => {
