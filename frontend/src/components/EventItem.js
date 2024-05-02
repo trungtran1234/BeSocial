@@ -2,17 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import '../css/event_item.css';
 
-  function EventItem({ event, onDelete }) {
-    const handleDelete = async () => {
-      try {
-        await axios.delete(`/events/${event.id}`);
-        // Inform the parent component that the event has been deleted
-        onDelete(event.id);
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        // Handle error
-      }
-    };
+  function EventItem({ event, onDelete, showDeleteButton}) {
     return (
       <div className="event-item">
         <h3>{event.title}</h3>
@@ -32,7 +22,9 @@ import '../css/event_item.css';
         <p>
           <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
         </p>
-        <button onClick={handleDelete}>Delete</button>
+        {showDeleteButton && (
+                <button onClick={() => onDelete()}>Delete</button>
+            )}
       </div>
     );
   }

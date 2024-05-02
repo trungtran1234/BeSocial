@@ -4,6 +4,7 @@ import RegistrationForm from './pages/Register';
 import LoginForm from './pages/Login';
 import Home from './pages/Home';
 import EventWall from './pages/EventWall'
+import UserWall from './pages/UserWall';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/" element={<ProtectedRoute><Home token={token}/></ProtectedRoute>} />
         <Route path="/event_wall" element={<ProtectedRoute><EventWall token={token}/></ProtectedRoute>} />
+        <Route path="/user_wall" element={<ProtectedRoute><UserWall token={token}/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
