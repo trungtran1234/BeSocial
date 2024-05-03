@@ -255,3 +255,36 @@ app.delete('/events/:id', authenticateToken, (req, res) => {
         }
     );
 });
+
+app.get('/profile', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Error retrieving user');
+        }
+        if (results.length > 0) {
+            res.status(200).send(results[0].username);
+        }
+    });
+});
+
+app.post('follow/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const followingId = req.params.id;
+    db.query('INSERT INTO following (id, following_id) VALUES (?, ?)', [userId, followingId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Error following user');
+        }
+        else {
+            return res.status(200).send('User followed');
+        }
+    })
+    db.query('INSERT INTO followers (id, follower_id) VALUES (?, ?)', [followingId, userId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Error following user');
+        }
+        else {
+            return res.status(200).send('New follower');
+        }
+    })
+});
