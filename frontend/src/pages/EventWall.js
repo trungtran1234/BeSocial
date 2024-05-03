@@ -30,7 +30,7 @@ function EventWall({ token: initialToken }) {
   
   
     const handleCreateEvent = async (formData) => {
-      await axios.post('/events_wall', formData, {
+      await axios.post('http://localhost:5000/event_walls', formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setShowEventForm(false);

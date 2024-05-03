@@ -113,29 +113,36 @@ app.post('/event_walls', authenticateToken, (req, res) => {
     if (new Date(startTime) >= new Date(endTime)) {
         return res.status(400).send('Start time must be before end time.');
     }
-
-    const eventData = {
-        title,
-        description,
-        location,
-        capacity,
-        category,
-        start_time: startTime,
-        end_time: endTime,
-        host_user_id: req.userId,
-    };
-
-    db.query(
-        'INSERT INTO events SET ?',
-        eventData,
-        (err, result) => {
-            if (err) {
-                console.error('Error creating event:', err);
-                return res.status(500).send('Error creating event');
-            }
-            return res.status(201).send({ eventId: result.insertId, message: 'Event created successfully' });
+    db.query('SELECT username FROM users WHERE id = ?', [req.userId], (err, results) => {
+        if (err) {
+            console.error('Error finding user:', err);
+            return res.status(500).send('Error finding user');
         }
-    );
+
+        const eventData = {
+            title,
+            description,
+            location,
+            capacity,
+            category,
+            start_time: startTime,
+            end_time: endTime,
+            host_user_id: req.userId,
+            host_username: results[0].username,
+        };
+
+        db.query(
+            'INSERT INTO events SET ?',
+            eventData,
+            (err, result) => {
+                if (err) {
+                    console.error('Error creating event:', err);
+                    return res.status(500).send('Error creating event');
+                }
+                return res.status(201).send({ eventId: result.insertId, message: 'Event created successfully' });
+            }
+        )
+    });
 });
 
 //get eventrs
@@ -291,4 +298,87 @@ app.delete('/events/:id', authenticateToken, (req, res) => {
             );
         }
     );
+});
+
+app.get('/profile', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Error retrieving user');
+        }
+        if (results.length > 0) {
+            res.status(200).send(results[0].username);
+        }
+    });
+});
+
+app.get('/profile/:id', authenticateToken, (req, res) => {
+    const userId = req.params.id;
+    console.log(userId, req.userId)
+    if (String(userId) === String(req.userId)) {
+        res.json({ redirectTo: '/profile' });
+
+    }
+    else {
+        db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+            if (err) {
+                return res.status(500).send('Error retrieving user');
+            }
+            if (results.length > 0) {
+                res.status(200).send(results[0]);
+            }
+        });
+    }
+});
+
+app.post('/follow/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const followingId = req.params.id;
+
+    db.query('INSERT INTO following (id, following_id) VALUES (?, ?)', [userId, followingId], (err, results) => {
+        if (err) {
+            console.error('Error following user:', err);
+            return res.status(500).send('Error following user');
+        }
+        db.query('INSERT INTO followers (id, follower_id) VALUES (?, ?)', [followingId, userId], (err, results) => {
+            if (err) {
+                console.error('Error adding follower:', err);
+                return res.status(500).send('Error adding follower');
+            }
+            return res.status(200).send('Follow successful');
+        });
+    });
+});
+
+app.get('/following/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const followingId = req.params.id;
+
+    db.query('SELECT 1 FROM following WHERE id = ? AND following_id = ?', [userId, followingId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving following:', err);
+            return res.status(500).send('Error retrieving following');
+        }
+        return res.status(200).send({ isFollowing: results.length > 0 });
+    });
+});
+
+
+app.post('/unfollow/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const followingId = req.params.id;
+
+    db.query('DELETE FROM following WHERE id = ? AND following_id = ?', [userId, followingId], (err, results) => {
+        if (err) {
+            console.error('Error unfollowing user:', err);
+            return res.status(500).send('Error unfollowing user');
+        }
+        db.query('DELETE FROM followers WHERE id = ? AND follower_id = ?', [followingId, userId], (err, results) => {
+            if (err) {
+                console.error('Error removing follower:', err);
+                return res.status(500).send('Error removing follower');
+            }
+            return res.status(200).send('Unfollow successful');
+        });
+    });
 });
