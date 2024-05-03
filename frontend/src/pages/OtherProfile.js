@@ -12,15 +12,13 @@ function UserProfile({ token }) {
         const fetchData = async () => {
             const headers = { Authorization: `Bearer ${token}` };
             try {
-                // Fetch the user profile and check for redirection
                 const response = await axios.get(`http://localhost:5000/profile/${userId}`, { headers });
                 if (response.data.redirectTo) {
-                    navigate(response.data.redirectTo);
+                    navigate(response.data.redirectTo, { replace: true });
                 } else {
                     setUsername(response.data.username);
                 }
 
-                // Fetch the follow status
                 const followStatus = await axios.get(`http://localhost:5000/following/${userId}`, { headers });
                 setIsFollowing(followStatus.data.isFollowing);
                 
