@@ -14,16 +14,26 @@ CREATE TABLE events (
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     host_user_id INT,
+    host_username VARCHAR (255) NOT NULL,
     FOREIGN KEY (host_user_id) REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE follows (
-    follower_id INT,
-    following_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (follower_id, following_id),
-    FOREIGN KEY (follower_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (following_id) REFERENCES users(user_id) ON DELETE CASCADE
+CREATE TABLE following (
+    id INT,         
+    following_id INT,   
+    following_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id, following_id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE followers (
+    id INT,         
+    follower_id INT,      
+    followed_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id, follower_id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE
 );

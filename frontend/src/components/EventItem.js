@@ -1,20 +1,26 @@
 import React from 'react';
 import axios from 'axios';
 import '../css/event_item.css';
+import { Link, useNavigate } from 'react-router-dom';
+import profileIcon from '../css/images/profileIcon.png';
 
-  function EventItem({ event, onDelete }) {
-    const handleDelete = async () => {
-      try {
-        await axios.delete(`/events/${event.id}`);
-        // Inform the parent component that the event has been deleted
-        onDelete(event.id);
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        // Handle error
+  function EventItem({ event, onDelete, showDeleteButton, currentUserID }) {
+    const navigate = useNavigate();
+
+    const handleProfileClick = () => {
+      if (event.host_user_id === currentUserID) {
+          navigate('/profile');
+      } else {
+          navigate(`/profile/${event.host_user_id}`);
       }
-    };
+  };
+
     return (
       <div className="event-item">
+                <h4>
+        <img src={profileIcon} alt="Profile" className="profileIcon" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
+        <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{event.host_username}</span>
+    </h4>
         <h3>{event.title}</h3>
         <p>{event.description}</p>
         <p>
@@ -32,7 +38,9 @@ import '../css/event_item.css';
         <p>
           <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
         </p>
-        <button onClick={handleDelete}>Delete</button>
+        {showDeleteButton && (
+                <button onClick={() => onDelete()}>Delete</button>
+            )}
       </div>
     );
   }

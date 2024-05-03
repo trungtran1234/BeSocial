@@ -17,8 +17,8 @@ function UserProfile({ token: initialToken }) {
     }, [token]);
 
     return (
-        <div className="profile-container">
-            <div className="profile-logo">
+        <div>
+            <div>
                 {username}
             </div>
         </div>

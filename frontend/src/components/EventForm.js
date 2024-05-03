@@ -23,7 +23,6 @@ function EventForm({ onSubmit, onCancel }) {
   };
 
   
-
   return (
     <form onSubmit={handleSubmit} className="event-form">
       <h2>Create New Event</h2>
