@@ -46,7 +46,8 @@ import profileIcon from '../css/images/profileIcon.png';
             )}
         {showUnFollowButton && (
                 <button onClick={() => onClickFunction()}>Unattend</button>
-            )}   
+            )}  
+          <button onClick={() => navigate(`/event/${event.id}`)}>View Event</button>
       </div>
     );
   }
