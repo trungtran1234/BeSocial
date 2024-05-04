@@ -4,7 +4,7 @@ import '../css/event_item.css';
 import { Link, useNavigate } from 'react-router-dom';
 import profileIcon from '../css/images/profileIcon.png';
 
-  function EventItem({ event, onDelete, showDeleteButton, currentUserID }) {
+  function EventItem({ event, onClickFunction, showDeleteButton, showFollowButton, showUnFollowButton, currentUserID }) {
     const navigate = useNavigate();
 
     const handleProfileClick = () => {
@@ -39,8 +39,14 @@ import profileIcon from '../css/images/profileIcon.png';
           <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
         </p>
         {showDeleteButton && (
-                <button onClick={() => onDelete()}>Delete</button>
+                <button onClick={() => onClickFunction()}>Delete</button>
             )}
+        {showFollowButton && (
+                <button onClick={() => onClickFunction()}>Attend</button>
+            )}
+        {showUnFollowButton && (
+                <button onClick={() => onClickFunction()}>Unattend</button>
+            )}   
       </div>
     );
   }

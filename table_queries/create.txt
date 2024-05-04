@@ -37,3 +37,20 @@ CREATE TABLE followers (
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE event_following (
+    user_id INT,         
+    event_id INT,   
+    following_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+CREATE TABLE event_followers (
+    event_id INT,
+    user_id INT,
+    PRIMARY KEY (user_id, event_id),
+    following_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
