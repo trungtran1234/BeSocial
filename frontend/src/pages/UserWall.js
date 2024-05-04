@@ -15,7 +15,6 @@ function UserWall({ token: initialToken  }) {
             const response = await axios.get('/user_events', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            // Filter events based on host_user_id
             setEvents(response.data);
         } catch (error) {
             console.error('Error fetching user events:', error);
@@ -58,6 +57,9 @@ function UserWall({ token: initialToken  }) {
             <Link to="/event_wall">
                 <button>View Local Events</button>
             </Link>
+            <Link to="/event_following">
+                <button>View Your Attending Events</button>
+            </Link>
             <div className="eventsListed">
                 {events.length === 0 ? (
                     <p>No events created yet.</p>
@@ -66,7 +68,7 @@ function UserWall({ token: initialToken  }) {
                         <EventItem
                             key={event.id}
                             event={event}
-                            onDelete={() => handleDeleteEvent(event.id)}
+                            onClickFunction={() => handleDeleteEvent(event.id)}
                             showDeleteButton={true}
                         />
                     ))

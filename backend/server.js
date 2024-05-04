@@ -146,41 +146,57 @@ app.post('/event_walls', authenticateToken, (req, res) => {
 });
 
 //get eventrs
+// app.get('/events', authenticateToken, (req, res) => {
+//     const { category, location, startTime, endTime } = req.query;
+
+//     let query = 'SELECT * FROM events WHERE 1=1';
+//     const queryParams = [];
+
+//     if (category) {
+//         query += ' AND category = ?';
+//         queryParams.push(category);
+//     }
+
+//     if (location) {
+//         query += ' AND location = ?';
+//         queryParams.push(location);
+//     }
+
+//     if (startTime) {
+//         query += ' AND start_time >= ?';
+//         queryParams.push(startTime);
+//     }
+
+//     if (endTime) {
+//         query += ' AND end_time <= ?';
+//         queryParams.push(endTime);
+//     }
+
+//     db.query(query, queryParams, (err, results) => {
+//         if (err) {
+//             console.error('Error retrieving events:', err);
+//             return res.status(500).send('Error retrieving events');
+//         }
+
+//         return res.status(200).send(results);
+//     });
+// });
 app.get('/events', authenticateToken, (req, res) => {
-    const { category, location, startTime, endTime } = req.query;
+    const userId = req.userId
 
-    let query = 'SELECT * FROM events WHERE 1=1';
-    const queryParams = [];
+    const subquery = 'SELECT event_id FROM event_following WHERE user_id = ?'
 
-    if (category) {
-        query += ' AND category = ?';
-        queryParams.push(category);
-    }
-
-    if (location) {
-        query += ' AND location = ?';
-        queryParams.push(location);
-    }
-
-    if (startTime) {
-        query += ' AND start_time >= ?';
-        queryParams.push(startTime);
-    }
-
-    if (endTime) {
-        query += ' AND end_time <= ?';
-        queryParams.push(endTime);
-    }
-
-    db.query(query, queryParams, (err, results) => {
-        if (err) {
+    const query = 'SELECT * FROM events WHERE id NOT IN (' + subquery +')';
+    
+    db.query(query, [userId], (err, results) => {
+        if(err){
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
-
         return res.status(200).send(results);
-    });
-});
+    })
+})
+
 //get user's events
 app.get('/user_events', authenticateToken, (req, res) => {
     const { category, location, startTime, endTime } = req.query;
@@ -217,6 +233,7 @@ app.get('/user_events', authenticateToken, (req, res) => {
         return res.status(200).send(results);
     });
 });
+
 
 
 //update event
@@ -374,6 +391,67 @@ app.post('/unfollow/:id', authenticateToken, (req, res) => {
             return res.status(500).send('Error unfollowing user');
         }
         db.query('DELETE FROM followers WHERE id = ? AND follower_id = ?', [followingId, userId], (err, results) => {
+            if (err) {
+                console.error('Error removing follower:', err);
+                return res.status(500).send('Error removing follower');
+            }
+            return res.status(200).send('Unfollow successful');
+        });
+    });
+});
+
+//Event followers
+app.post('/post_event_following/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    db.query('INSERT INTO event_following (user_id, event_id) VALUES (?, ?)', [userId, eventId], (err, results) => {
+        if (err) {
+            console.error('Error following event:', err);
+            return res.status(500).send('Error following event');
+        }
+        db.query('INSERT INTO event_followers (event_id, user_id) VALUES (?, ?)', [eventId, userId], (err, results) => {
+            if (err) {
+                console.error('Error adding event follower:', err);
+                return res.status(500).send('Error adding follower');
+            }
+            return res.status(200).send('Follow successful');
+        });
+    });
+});
+
+app.get('/get_event_following', authenticateToken, (req, res) => {
+    const userId = req.userId;
+
+    db.query('SELECT event_id FROM event_following WHERE user_id = ?', [userId], (err, results) => {
+        if(err) {
+            console.error('Error retrieving following:', err);
+            return res.status(500).send('Error retrieveing event_following');
+        }
+        const eventIds = results.map(row => row.event_id);
+
+        if(eventIds.length === 0){
+            return res.status(200).send([]);
+        }
+        db.query('SELECT * FROM events WHERE id IN (?)', [eventIds], (err, eventResults) => {
+            if(err) {
+                console.error('Error retrieiveing events:', err);
+                return res.status(500).send('Error retrieving events');
+            }
+            res.status(200).send(eventResults);
+        });
+    })    
+});
+app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    db.query('DELETE FROM event_following WHERE user_id = ? AND event_id = ?', [userId, eventId], (err, results) => {
+        if (err) {
+            console.error('Error unfollowing user:', err);
+            return res.status(500).send('Error unfollowing user');
+        }
+        db.query('DELETE FROM event_followers WHERE event_id = ? AND user_id = ?', [eventId, userId], (err, results) => {
             if (err) {
                 console.error('Error removing follower:', err);
                 return res.status(500).send('Error removing follower');

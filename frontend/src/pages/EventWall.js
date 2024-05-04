@@ -28,32 +28,35 @@ function EventWall({ token: initialToken }) {
     
     }, [token]);
   
-  
-    const handleCreateEvent = async (formData) => {
-      await axios.post('http://localhost:5000/event_walls', formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setShowEventForm(false);
-      fetchEvents();
-    };
+    const handleFollowEvent = async (eventId) => {
+      try {
+        const response = await axios.post(
+          `/post_event_following/${eventId}`, null, {
+              headers: { Authorization: `Bearer ${token}` },           
+        });
+        console.log(response.data)
+        setEvents(events.filter(event => event.id !== eventId))
+      }catch(error){
+        console.error('Error following event:', error);
+      }
+    }
     return (
       <div className="eventWallContainer">
         <Taskbar/>
         <div> Event Wall </div>
-        <button onClick={() => setShowEventForm(true)}>Create New Event</button>
+
         <Link to="/user_wall">
           <button>View Your Events</button>
         </Link>
-        {showEventForm && (
-          <div className="popup">
-            <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
-          </div>
-        )}
+
+        <Link to="/event_following">
+          <button>View Your Attending Events</button>
+        </Link>
         <div className="eventsListed">
           {events.length === 0 ? (
-            <p>No events posted yet.</p>
+            <p>No events nearby.</p>
           ) : (
-            events.map((event) => <EventItem key={event.id} event={event}/>)
+            events.map((event) => <EventItem key={event.id} event={event} onClickFunction={() => handleFollowEvent(event.id)} showFollowButton={true}/>)
           )}
         </div>
       </div>

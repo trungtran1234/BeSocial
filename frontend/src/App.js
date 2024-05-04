@@ -8,7 +8,7 @@ import UserWall from './pages/UserWall';
 import ProtectedRoute from './components/ProtectedRoute';
 import Profile from './pages/UserProfile';
 import OtherProfile from './pages/OtherProfile';
-
+import EventFollowing from './pages/EventFollowing';
 function App() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   useEffect(() => {
@@ -25,6 +25,7 @@ function App() {
         <Route path="/profile/" element={<ProtectedRoute><Profile token={token}/></ProtectedRoute>} />
         <Route path="/user_wall" element={<ProtectedRoute><UserWall token={token}/></ProtectedRoute>} />
         <Route path="/profile/:userId" element={<ProtectedRoute><OtherProfile token={token}/></ProtectedRoute>} />
+        <Route path="/event_following" element={<ProtectedRoute><EventFollowing token={token}/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
