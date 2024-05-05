@@ -145,57 +145,26 @@ app.post('/event_walls', authenticateToken, (req, res) => {
     });
 });
 
-//get eventrs
-// app.get('/events', authenticateToken, (req, res) => {
-//     const { category, location, startTime, endTime } = req.query;
-
-//     let query = 'SELECT * FROM events WHERE 1=1';
-//     const queryParams = [];
-
-//     if (category) {
-//         query += ' AND category = ?';
-//         queryParams.push(category);
-//     }
-
-//     if (location) {
-//         query += ' AND location = ?';
-//         queryParams.push(location);
-//     }
-
-//     if (startTime) {
-//         query += ' AND start_time >= ?';
-//         queryParams.push(startTime);
-//     }
-
-//     if (endTime) {
-//         query += ' AND end_time <= ?';
-//         queryParams.push(endTime);
-//     }
-
-//     db.query(query, queryParams, (err, results) => {
-//         if (err) {
-//             console.error('Error retrieving events:', err);
-//             return res.status(500).send('Error retrieving events');
-//         }
-
-//         return res.status(200).send(results);
-//     });
-// });
+//get events
 app.get('/events', authenticateToken, (req, res) => {
-    const userId = req.userId
+    const userId = req.userId;
 
-    const subquery = 'SELECT event_id FROM event_following WHERE user_id = ?'
-
-    const query = 'SELECT * FROM events WHERE id NOT IN (' + subquery +')';
+    const subquery = 'SELECT event_id FROM event_following WHERE user_id = ?';
     
-    db.query(query, [userId], (err, results) => {
+    // Get events that is not attended and not created by the user
+    const query = 'SELECT * FROM events WHERE id NOT IN (' + subquery + ') AND host_user_id != ?';
+;
+    
+    // Pass both userId and userId again to prevent SQL injection
+    db.query(query, [userId, userId], (err, results) => {
         if(err){
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
         return res.status(200).send(results);
-    })
-})
+    });
+});
+
 
 //get user's events
 app.get('/user_events', authenticateToken, (req, res) => {
@@ -367,6 +336,7 @@ app.post('/follow/:id', authenticateToken, (req, res) => {
     });
 });
 
+//get following user
 app.get('/following/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const followingId = req.params.id;
@@ -380,7 +350,7 @@ app.get('/following/:id', authenticateToken, (req, res) => {
     });
 });
 
-
+//Unfollow user
 app.post('/unfollow/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const followingId = req.params.id;
@@ -415,11 +385,12 @@ app.post('/post_event_following/:id', authenticateToken, (req, res) => {
                 console.error('Error adding event follower:', err);
                 return res.status(500).send('Error adding follower');
             }
-            return res.status(200).send('Follow successful');
+            return res.status(200).send(userId + ' Sucessfully follow ' + eventId);
         });
     });
 });
 
+//get attending event
 app.get('/get_event_following', authenticateToken, (req, res) => {
     const userId = req.userId;
 
@@ -442,6 +413,32 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
         });
     })    
 });
+//get event's guest
+app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+
+    db.query('SELECT user_id FROM event_followers WHERE event_id = ?', [eventId], (err, results) => {
+        if(err) {
+            console.error('Error retrieving following:', err);
+            return res.status(500).send('Error retrieveing event_following');
+        }
+        const guestId = results.map(row => row.user_id);
+
+        if(guestId.length === 0){
+            return res.status(200).send([]);
+        }
+        db.query('SELECT * FROM users WHERE id IN (?)', [guestId], (err, eventResults) => {
+            if(err) {
+                console.error('Error retrieving events:', err);
+                return res.status(500).send('Error retrieving events');
+            }
+            res.status(200).send(eventResults);
+        });
+    })    
+});
+
+
+//unattend event
 app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const eventId = req.params.id;

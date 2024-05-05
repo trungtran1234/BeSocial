@@ -3,7 +3,7 @@ import axios from 'axios';
 import EventItem from '../components/EventItem';
 import '../css/event_wall.css';
 import { Link } from 'react-router-dom';
-
+import Taskbar from '../components/Taskbar';
 function EventFollowing({ token: initialToken }){
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([])
@@ -39,6 +39,7 @@ function EventFollowing({ token: initialToken }){
 
     return (
         <div className="eventWallContainer">
+            <Taskbar/>
             <div> Your Attending Events </div>
             <Link to="/event_wall">
                 <button>View Local Events</button>

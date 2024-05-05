@@ -3,7 +3,7 @@ import axios from 'axios';
 import EventItem from '../components/EventItem';
 import { Link, useNavigate } from 'react-router-dom';
 import EventForm from '../components/EventForm';
-
+import Taskbar from '../components/Taskbar';
 function UserWall({ token: initialToken  }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
@@ -47,6 +47,7 @@ function UserWall({ token: initialToken  }) {
 
     return (
         <div className="eventWallContainer">
+            <Taskbar/>
             <div> Your Events </div>
             <button onClick={() => setShowEventForm(true)}>Create New Event</button>
             {showEventForm && (
@@ -69,6 +70,7 @@ function UserWall({ token: initialToken  }) {
                             key={event.id}
                             event={event}
                             onClickFunction={() => handleDeleteEvent(event.id)}
+                            showGuestButton={true}
                             showDeleteButton={true}
                         />
                     ))
