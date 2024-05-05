@@ -488,3 +488,60 @@ app.post('/events/:id/comments', authenticateToken, (req, res) => {
         });
     });
 });
+
+app.post('/post_event_following/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    db.query('INSERT INTO event_following (user_id, event_id) VALUES (?, ?)', [userId, eventId], (err, results) => {
+        if (err) {
+            console.error('Error following event:', err);
+            return res.status(500).send('Error following event');
+        }
+        db.query('INSERT INTO event_followers (event_id, user_id) VALUES (?, ?)', [eventId, userId], (err, results) => {
+            if (err) {
+                console.error('Error adding event follower:', err);
+                return res.status(500).send('Error adding follower');
+            }
+            return res.status(200).send('Follow successful');
+        });
+    });
+});
+
+app.post('/bookmark/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    // Check if the event exists
+    db.query('SELECT id FROM events WHERE id = ?', [eventId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Database error while checking event');
+        }
+        if (results.length === 0) {
+            return res.status(404).send('Event not found');
+        }
+
+        // Insert bookmark
+        db.query('INSERT INTO event_bookmarks (user_id, event_id) VALUES (?, ?)', [userId, eventId], (err, results) => {
+            if (err) {
+                console.error('Error bookmarking event:', err);
+                return res.status(500).send('Error bookmarking event');
+            }
+            return res.status(200).send({ message: 'Event bookmarked successfully' });
+        });
+    });
+});
+
+app.get('/bookmarked_events', authenticateToken, (req, res) => {
+    const userId = req.userId;
+
+    db.query('SELECT e.* FROM events e JOIN event_bookmarks eb ON e.id = eb.event_id WHERE eb.user_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving bookmarked events:', err);
+            return res.status(500).send('Error retrieving bookmarked events');
+        }
+        res.status(200).send(results);
+    });
+});
+
+

@@ -10,6 +10,7 @@ import Profile from './pages/UserProfile';
 import OtherProfile from './pages/OtherProfile';
 import EventFollowing from './pages/EventFollowing';
 import EventDetails from './pages/EventDetails';
+import BookmarkedEvents from './pages/Bookmark';
 function App() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   useEffect(() => {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/profile/:userId" element={<ProtectedRoute><OtherProfile token={token}/></ProtectedRoute>} />
         <Route path="/event_following" element={<ProtectedRoute><EventFollowing token={token}/></ProtectedRoute>} />
         <Route path="/event/:id" element={<ProtectedRoute><EventDetails token={token}/></ProtectedRoute>} />
+        <Route path="/bookmarked_events" element={<ProtectedRoute><BookmarkedEvents token={token}/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
