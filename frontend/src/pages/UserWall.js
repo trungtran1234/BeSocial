@@ -48,19 +48,13 @@ function UserWall({ token: initialToken  }) {
     return (
         <div className="eventWallContainer">
             <Taskbar/>
-            <div> Your Events </div>
+            <h3> Your Hosting Events </h3>
             <button onClick={() => setShowEventForm(true)}>Create New Event</button>
             {showEventForm && (
                 <div className="popup">
                     <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
                 </div>
             )}
-            <Link to="/event_wall">
-                <button>View Local Events</button>
-            </Link>
-            <Link to="/event_following">
-                <button>View Your Attending Events</button>
-            </Link>
             <div className="eventsListed">
                 {events.length === 0 ? (
                     <p>No events created yet.</p>

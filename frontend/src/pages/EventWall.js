@@ -10,7 +10,6 @@ import { Link, useNavigate } from 'react-router-dom';
 function EventWall({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
-    const [showEventForm, setShowEventForm] = useState(false);
   
     console.log(token);
     const fetchEvents = async () => {
@@ -26,7 +25,6 @@ function EventWall({ token: initialToken }) {
   
     useEffect(() => {
       fetchEvents();
-    
     }, [token]);
   
     const handleFollowEvent = async (eventId) => {
@@ -44,15 +42,7 @@ function EventWall({ token: initialToken }) {
     return (
       <div className="eventWallContainer">
         <Taskbar/>
-        <div> Event Wall </div>
-
-        <Link to="/user_wall">
-          <button>View Your Events</button>
-        </Link>
-
-        <Link to="/event_following">
-          <button>View Your Attending Events</button>
-        </Link>
+        <h3> Event Wall </h3>
         <div className="eventsListed">
           {events.length === 0 ? (
             <p>No events nearby.</p>
