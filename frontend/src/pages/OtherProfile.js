@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Taskbar from '../components/Taskbar';
 
 function UserProfile({ token }) {
     const [username, setUsername] = useState('');
@@ -44,6 +45,7 @@ function UserProfile({ token }) {
 
     return (
         <div>
+            <Taskbar/>
             <div>{username}</div>
             <button onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
         </div>
