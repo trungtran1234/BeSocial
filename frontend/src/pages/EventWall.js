@@ -6,6 +6,7 @@ import '../css/event_wall.css';
 import Taskbar from '../components/Taskbar';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 function EventWall({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);

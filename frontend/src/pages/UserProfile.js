@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/profile.css';
-
+import Taskbar from '../components/Taskbar';
 function UserProfile({ token: initialToken }) {
     const [username, setUsername] = useState('');
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
@@ -18,6 +18,7 @@ function UserProfile({ token: initialToken }) {
 
     return (
         <div>
+            <Taskbar/>
             <div>
                 {username}
             </div>
