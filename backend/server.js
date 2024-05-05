@@ -145,7 +145,25 @@ app.post('/event_walls', authenticateToken, (req, res) => {
     });
 });
 
-//get events
+// get event by id
+app.get('/events/:id', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+    db.query('SELECT * FROM events WHERE id = ?', [eventId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving event:', err);
+            return res.status(500).send('Error retrieving event');
+        }
+        if (results.length > 0) {
+            res.status(200).send(results[0]);
+        } else {
+            res.status(404).send('Event not found');
+        }
+    });
+});
+
+
+
+
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
 
@@ -300,7 +318,6 @@ app.get('/profile', authenticateToken, (req, res) => {
 
 app.get('/profile/:id', authenticateToken, (req, res) => {
     const userId = req.params.id;
-    console.log(userId, req.userId)
     if (String(userId) === String(req.userId)) {
         res.json({ redirectTo: '/profile' });
 
@@ -454,6 +471,52 @@ app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
                 return res.status(500).send('Error removing follower');
             }
             return res.status(200).send('Unfollow successful');
+        });
+    });
+});
+
+app.get('/events/:id/comments', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+    db.query('SELECT comments.*, users.username AS username FROM comments JOIN users ON comments.user_id = users.id WHERE event_id = ?', [eventId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving comments:', err);
+            return res.status(500).send('Error retrieving comments');
+        }
+        res.status(200).send(results);
+    });
+});
+
+app.post('/events/:id/comments', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+    const { content } = req.body;
+    const userId = req.userId
+
+    if (!content) {
+        return res.status(400).send('Comment content cannot be empty.');
+    }
+
+    const insertQuery = 'INSERT INTO comments (event_id, user_id, content) VALUES (?, ?, ?)';
+    db.query(insertQuery, [eventId, userId, content], (err, result) => {
+        if (err) {
+            console.error('Error posting comment:', err);
+            return res.status(500).send('Error posting comment');
+        }
+
+        const userQuery = 'SELECT username FROM users WHERE id = ?';
+        db.query(userQuery, [userId], (err, userResults) => {
+            if (err) {
+                console.error('Error retrieving username:', err);
+                return res.status(500).send('Error retrieving username');
+            }
+            const newComment = {
+                id: result.insertId,
+                event_id: eventId,
+                user_id: userId,
+                username: userResults[0].username,
+                content: content,
+                created_at: new Date() 
+            };
+            res.status(201).send(newComment);
         });
     });
 });
