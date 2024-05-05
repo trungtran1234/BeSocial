@@ -30,8 +30,6 @@ function EventFollowing({ token: initialToken }){
             console.error('Error unfollowing event:', error);
         }
     }
-    
-    
 
     useEffect(() => {
         fetchUserEvents();
@@ -40,13 +38,8 @@ function EventFollowing({ token: initialToken }){
     return (
         <div className="eventWallContainer">
             <Taskbar/>
-            <div> Your Attending Events </div>
-            <Link to="/event_wall">
-                <button>View Local Events</button>
-            </Link>
-            <Link to="/user_wall">
-                <button>View Your Events</button>
-            </Link>
+            <h3> Your Attending Events </h3>
+
             <div className="eventsListed">
                 {events.length === 0 ? (
                     <p>No events attended yet.</p>

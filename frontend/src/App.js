@@ -29,7 +29,7 @@ function App() {
         <Route path="/profile/:userId" element={<ProtectedRoute><OtherProfile token={token}/></ProtectedRoute>} />
         <Route path="/event_following" element={<ProtectedRoute><EventFollowing token={token}/></ProtectedRoute>} />
         <Route path="/event/:id" element={<ProtectedRoute><EventDetails token={token}/></ProtectedRoute>} />
-        <Route path="/guest_list" element={<ProtectedRoute><GuestList token={token}/></ProtectedRoute>} />
+        <Route path="/guest_list/:id" element={<ProtectedRoute><GuestList token={token}/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
