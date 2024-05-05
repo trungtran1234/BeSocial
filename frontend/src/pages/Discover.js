@@ -7,7 +7,7 @@ import Taskbar from '../components/Taskbar';
 import { Link, useNavigate } from 'react-router-dom';
 
 
-function EventWall({ token: initialToken }) {
+function Discover({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
   
@@ -42,8 +42,8 @@ function EventWall({ token: initialToken }) {
     return (
       <div className="eventWallContainer">
         <Taskbar/>
-        <h3> Event Wall (when fully implemented this should only show the events checked in by people you follow) </h3>
-        <h3> - Event search functionality will be implemented on the home page via popup </h3>
+        <h3> Discover Events </h3>
+        <h3> - Displays all active event postings </h3>
         <div className="eventsListed">
           {events.length === 0 ? (
             <p>No events nearby.</p>
@@ -55,4 +55,4 @@ function EventWall({ token: initialToken }) {
     );
   }
   
-  export default EventWall;
+  export default Discover;

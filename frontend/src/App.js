@@ -11,6 +11,8 @@ import OtherProfile from './pages/OtherProfile';
 import EventFollowing from './pages/EventFollowing';
 import EventDetails from './pages/EventDetails';
 import GuestList from './components/GuestList';
+import Discover from './pages/Discover';
+
 function App() {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   useEffect(() => {
@@ -24,6 +26,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/" element={<ProtectedRoute><Home token={token}/></ProtectedRoute>} />
         <Route path="/event_wall" element={<ProtectedRoute><EventWall token={token}/></ProtectedRoute>} />
+        <Route path="/discover" element={<ProtectedRoute><Discover token={token}/></ProtectedRoute>} />
         <Route path="/profile/" element={<ProtectedRoute><Profile token={token}/></ProtectedRoute>} />
         <Route path="/user_wall" element={<ProtectedRoute><UserWall token={token}/></ProtectedRoute>} />
         <Route path="/profile/:userId" element={<ProtectedRoute><OtherProfile token={token}/></ProtectedRoute>} />
