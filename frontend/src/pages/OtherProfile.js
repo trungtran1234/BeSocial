@@ -3,7 +3,7 @@ import axios from 'axios';
 import '../css/profile.css';
 import { useParams } from 'react-router-dom';
 import Taskbar from '../components/Taskbar';
-import FollowModal from '../components/FollowModal';  // Ensure this is correctly imported
+import FollowModal from '../components/FollowModal';
 
 function UserProfile({ token: initialToken }) {
     const [userData, setUserData] = useState({
@@ -17,7 +17,7 @@ function UserProfile({ token: initialToken }) {
     const [showFollowersModal, setShowFollowersModal] = useState(false);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/profile/${userId}`, {  // Ensure the URL correctly includes the userId
+        axios.get(`http://localhost:5000/profile/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
         }).then(response => {
             setUserData(response.data);
@@ -37,7 +37,7 @@ function UserProfile({ token: initialToken }) {
                 title="Following"
             >
                 <ul>
-                    {userData.following.map((user, index) => (  // Assuming userData.following contains objects with a username property
+                    {userData.following.map((user, index) => ( 
                         <li key={index}>{user.username}</li>
                     ))}
                 </ul>
@@ -49,7 +49,7 @@ function UserProfile({ token: initialToken }) {
                 title="Followers"
             >
                 <ul>
-                    {userData.followers.map((user, index) => (  // Assuming userData.followers contains objects with a username property
+                    {userData.followers.map((user, index) => (
                         <li key={index}>{user.username}</li>
                     ))}
                 </ul>
