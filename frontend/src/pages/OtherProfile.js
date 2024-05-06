@@ -1,53 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../css/profile.css';
+import { useParams } from 'react-router-dom';
 import Taskbar from '../components/Taskbar';
+import FollowModal from '../components/FollowModal';
 
-function UserProfile({ token }) {
-    const [username, setUsername] = useState('');
-    const [isFollowing, setIsFollowing] = useState(false);
+function UserProfile({ token: initialToken }) {
+    const [userData, setUserData] = useState({
+        username: '',
+        following: [],
+        followers: []
+    });
+    const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const { userId } = useParams();
-    const navigate = useNavigate();
+    const [showFollowingModal, setShowFollowingModal] = useState(false);
+    const [showFollowersModal, setShowFollowersModal] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const headers = { Authorization: `Bearer ${token}` };
-            try {
-                const response = await axios.get(`http://localhost:5000/profile/${userId}`, { headers });
-                if (response.data.redirectTo) {
-                    navigate(response.data.redirectTo, { replace: true });
-                } else {
-                    setUsername(response.data.username);
-                }
-
-                const followStatus = await axios.get(`http://localhost:5000/following/${userId}`, { headers });
-                setIsFollowing(followStatus.data.isFollowing);
-                
-                console.log(followStatus.data.isFollowing);
-            } catch (error) {
-                console.error('Failed to fetch profile data:', error);
-            }
-        };
-
-        fetchData();
-    }, [userId, token, navigate]);
-
-    const toggleFollow = async () => {
-        const headers = { Authorization: `Bearer ${token}` };
-        const url = `http://localhost:5000/${isFollowing ? 'unfollow' : 'follow'}/${userId}`;
-        try {
-            await axios.post(url, {}, { headers });
-            setIsFollowing(!isFollowing);
-        } catch (error) {
-            console.error('Failed to toggle follow status:', error);
-        }
-    };
+        axios.get(`http://localhost:5000/profile/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        }).then(response => {
+            setUserData(response.data);
+        }).catch(error => {
+            console.error('Error fetching profile:', error);
+        });
+    }, [token, userId]);
 
     return (
         <div>
-            <Taskbar/>
-            <div>{username}</div>
-            <button onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
+            <Taskbar />
+            <h1>{userData.username}</h1>
+            <button onClick={() => setShowFollowingModal(true)}>Following</button>
+            <FollowModal
+                isOpen={showFollowingModal}
+                onClose={() => setShowFollowingModal(false)}
+                title="Following"
+            >
+                <ul>
+                    {userData.following.map((user, index) => ( 
+                        <li key={index}>{user.username}</li>
+                    ))}
+                </ul>
+            </FollowModal>
+            <button onClick={() => setShowFollowersModal(true)}>Followers</button>
+            <FollowModal
+                isOpen={showFollowersModal}
+                onClose={() => setShowFollowersModal(false)}
+                title="Followers"
+            >
+                <ul>
+                    {userData.followers.map((user, index) => (
+                        <li key={index}>{user.username}</li>
+                    ))}
+                </ul>
+            </FollowModal>
         </div>
     );
 }

@@ -309,29 +309,77 @@ app.get('/profile', authenticateToken, (req, res) => {
         if (err) {
             return res.status(500).send('Error retrieving user');
         }
-        if (results.length > 0) {
-            res.status(200).send(results[0].username);
+        if (results.length === 0) {
+            return res.status(404).send('User not found');
         }
+        const username = results[0].username;
+        const userData = { username };
+        db.query(`
+            SELECT users.username, users.id
+            FROM users 
+            JOIN following ON users.id = following.following_id 
+            WHERE following.id = ?`, [userId], (err, followingResults) => {
+            if (err) {
+                return res.status(500).send('Error retrieving following list');
+            }
+            userData.following = followingResults.map(f => f.username);
+            db.query(`
+                SELECT users.username, users.id
+                FROM users 
+                JOIN followers ON users.id = followers.follower_id 
+                WHERE followers.id = ?`, [userId], (err, followersResults) => {
+                if (err) {
+                    return res.status(500).send('Error retrieving followers list');
+                }
+                userData.followers = followersResults.map(f => f.username);
+                res.status(200).send(userData);
+            });
+        });
     });
 });
 
+
 app.get('/profile/:id', authenticateToken, (req, res) => {
     const userId = req.params.id;
+    
     if (String(userId) === String(req.userId)) {
         res.json({ redirectTo: '/profile' });
-
-    }
-    else {
+    } else {
         db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
             if (err) {
                 return res.status(500).send('Error retrieving user');
             }
-            if (results.length > 0) {
-                res.status(200).send(results[0]);
+            if (results.length === 0) {
+                return res.status(404).send('User not found');
             }
+
+            const username = results[0].username;
+            const userData = { username, following: [], followers: [] };
+            db.query(`
+                SELECT users.id, users.username 
+                FROM users 
+                JOIN following ON users.id = following.following_id 
+                WHERE following.id = ?`, [userId], (err, followingResults) => {
+                if (err) {
+                    return res.status(500).send('Error retrieving following list');
+                }
+                userData.following = followingResults.map(f => ({ id: f.id, username: f.username }));
+                db.query(`
+                    SELECT users.id, users.username 
+                    FROM users 
+                    JOIN followers ON users.id = followers.follower_id 
+                    WHERE followers.id = ?`, [userId], (err, followersResults) => {
+                    if (err) {
+                        return res.status(500).send('Error retrieving followers list');
+                    }
+                    userData.followers = followersResults.map(f => ({ id: f.id, username: f.username }));
+                    res.status(200).json(userData);
+                });
+            });
         });
     }
 });
+
 
 app.post('/follow/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
@@ -588,4 +636,26 @@ app.get('/bookmarked_events', authenticateToken, (req, res) => {
     });
 });
 
+app.get('/user/:id/following', authenticateToken, (req, res) => {
+    const userId = req.params.id;
 
+    db.query('SELECT u.id, u.username FROM users u JOIN following f ON u.id = f.following_id WHERE f.id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving following list:', err);
+            return res.status(500).send('Error retrieving following list');
+        }
+        res.send(results);
+    });
+});
+
+app.get('/user/:id/followers', authenticateToken, (req, res) => {
+    const userId = req.params.id;
+
+    db.query('SELECT u.id, u.username FROM users u JOIN followers f ON u.id = f.follower_id WHERE f.id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving followers list:', err);
+            return res.status(500).send('Error retrieving followers list');
+        }
+        res.send(results);
+    });
+});
