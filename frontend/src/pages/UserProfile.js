@@ -19,7 +19,7 @@ function UserProfile({ token: initialToken }) {
     }, [token, userId]);
 
     return (
-        <div>
+        <div className = "profileContainer">
             <Taskbar />
             <h1>{userData.username}</h1>
             <button onClick={() => setShowFollowingModal(true)}>Following</button>

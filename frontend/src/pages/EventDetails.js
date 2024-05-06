@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import profileIcon from '../css/images/profileIcon.png';
 import Taskbar from '../components/Taskbar';
+import '../css/event_details.css';
+
 const EventDetails = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
@@ -65,38 +67,45 @@ const EventDetails = () => {
   if (!event) return <div>No event found.</div>;
 
   return (
-    <div>
+    <div className = "eventContainer">
       <Taskbar/>
-      <h2>{event.title}</h2>
-      <p>Description: {event.description}</p>
-      <p>Location: {event.location}</p>
-      <p>Start Time: {new Date(event.start_time).toLocaleString()}</p>
-      <p>End Time: {new Date(event.end_time).toLocaleString()}</p>
-      <p>Capacity: {event.capacity}</p>
-      <p>Category: {event.category}</p>
-
-      <div>
-        <h3>Comments:</h3>
-        {comments.map(comment => (
-          <div key={comment.id}>
-            <div>
-              <img src={profileIcon} alt="Profile" className='profileIcon' onClick={() => navigate(`/profile/${comment.user_id}`)}/>
-              <span onClick={() => navigate(`/profile/${comment.user_id}`)} style={{ cursor: 'pointer' }} className>{comment.username} </span>
-              <span >{new Date(comment.created_at).toLocaleString()}</span>
-            </div>
-            <div>{comment.content}</div>
-          </div>
-        ))}
-        <form onSubmit={handleCommentSubmit}>
-        <input
-         type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          required
-        />
-        <button type="submit">Post</button>
-      </form>
+      <div className = "outerEventDetailsContainer">
+        <div className = "eventDetailsContainer">
+          <h1>Event Details:</h1>
+          <h2>{event.title}</h2>
+          <p>Description: {event.description}</p>
+          <p>Location: {event.location}</p>
+          <p>Start Time: {new Date(event.start_time).toLocaleString()}</p>
+          <p>End Time: {new Date(event.end_time).toLocaleString()}</p>
+          <p>Capacity: {event.capacity}</p>
+          <p>Category: {event.category}</p>
+        </div>
+        <div className = "eventGuestListContainer">
+          <h1>Guest List:</h1>
+        </div>
+        <div className = "eventCommentsContainer">
+          <h1>Comments:</h1>
+          <form onSubmit={handleCommentSubmit}>
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              required
+            />
+            <button type="submit">Post</button>
+          </form>
+            {comments.map(comment => (
+              <div key={comment.id}>
+                <div>
+                  <img src={profileIcon} alt="Profile" className='profileIcon' onClick={() => navigate(`/profile/${comment.user_id}`)}/>
+                  <span onClick={() => navigate(`/profile/${comment.user_id}`)} style={{ cursor: 'pointer' }} className>{comment.username} </span>
+                  <span >{new Date(comment.created_at).toLocaleString()}</span>
+                </div>
+                <div>{comment.content}</div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
