@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import profileIcon from '../css/images/profileIcon.png';
-
+import Taskbar from '../components/Taskbar';
 const EventDetails = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
@@ -66,6 +66,7 @@ const EventDetails = () => {
 
   return (
     <div>
+      <Taskbar/>
       <h2>{event.title}</h2>
       <p>Description: {event.description}</p>
       <p>Location: {event.location}</p>

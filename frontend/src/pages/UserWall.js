@@ -3,7 +3,7 @@ import axios from 'axios';
 import EventItem from '../components/EventItem';
 import { Link, useNavigate } from 'react-router-dom';
 import EventForm from '../components/EventForm';
-
+import Taskbar from '../components/Taskbar';
 function UserWall({ token: initialToken  }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
@@ -47,19 +47,14 @@ function UserWall({ token: initialToken  }) {
 
     return (
         <div className="eventWallContainer">
-            <div> Your Events </div>
+            <Taskbar/>
+            <h3> Your Hosting Events </h3>
             <button onClick={() => setShowEventForm(true)}>Create New Event</button>
             {showEventForm && (
                 <div className="popup">
                     <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
                 </div>
             )}
-            <Link to="/event_wall">
-                <button>View Local Events</button>
-            </Link>
-            <Link to="/event_following">
-                <button>View Your Attending Events</button>
-            </Link>
             <div className="eventsListed">
                 {events.length === 0 ? (
                     <p>No events created yet.</p>
@@ -68,7 +63,8 @@ function UserWall({ token: initialToken  }) {
                         <EventItem
                             key={event.id}
                             event={event}
-                            onClickFunction={() => handleDeleteEvent(event.id)}
+                            onDelete={() => handleDeleteEvent(event.id)}
+                            showGuestButton={true}
                             showDeleteButton={true}
                         />
                     ))

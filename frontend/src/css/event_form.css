@@ -1,5 +1,5 @@
 .event-form {
-    background-color: #549797;
+    background-color: #b0dfdf;
     padding: 2.8rem;
     border-radius: 8px;
     max-width: 500px;
@@ -62,7 +62,7 @@
     z-index: 1050;
     background-color: #fff;
     padding: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
     border-radius: 10px;
   }
   

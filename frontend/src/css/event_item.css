@@ -1,9 +1,11 @@
 .event-item {
-    background-color: #998585;
+    background-color: #eeeeee;
+    border: 0.11vw solid black;
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 1rem;
     width: 15%;
     height: 25%;
     position: relative;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.8);
 }
