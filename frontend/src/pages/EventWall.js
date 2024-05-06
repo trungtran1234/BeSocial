@@ -6,10 +6,10 @@ import '../css/event_wall.css';
 import Taskbar from '../components/Taskbar';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 function EventWall({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
-    const [showEventForm, setShowEventForm] = useState(false);
   
     useEffect(() => {
       const fetchEvents = async () => {
@@ -74,15 +74,8 @@ function EventWall({ token: initialToken }) {
     return (
       <div className="eventWallContainer">
         <Taskbar/>
-        <div> Event Wall </div>
-
-        <Link to="/user_wall">
-          <button>View Your Events</button>
-        </Link>
-
-        <Link to="/event_following">
-          <button>View Your Attending Events</button>
-        </Link>
+        <h3> Event Wall (when fully implemented this should only show the events checked in by people you follow) </h3>
+        <h3> - Event search functionality will be implemented on the home page via popup </h3>
         <div className="eventsListed">
           {events.length === 0 ? (
             <p>No events nearby.</p>
