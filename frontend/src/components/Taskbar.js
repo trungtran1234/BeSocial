@@ -36,6 +36,7 @@ function Taskbar({ token: initialToken }) {
                     <button onClick={() => handleNavigation('/event_wall')} className={`navButton ${isActive('/event_wall')}`}>Event Wall</button>
                     <button onClick={() => handleNavigation('/user_wall')} className={`navButton ${isActive('/user_wall')}`}>Events Hosted</button>
                     <button onClick={() => handleNavigation('/event_following')} className={`navButton ${isActive('/event_following')}`}>Events Attended</button>
+                    <button onClick={() => handleNavigation('/bookmarked_events')} className={`navButton ${isActive('/bookmarked_events')}`}>Bookmarked Events</button>
                 </div>
                 <div className="taskBarRight">
                     <img src={profileIcon} alt="Profile" className="profileIcon" onClick={() => navigate('/profile')} />

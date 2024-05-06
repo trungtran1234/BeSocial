@@ -11,21 +11,24 @@ function EventWall({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
   
-    console.log(token);
-    const fetchEvents = async () => {
-      try {
-        const response = await axios.get('/events', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setEvents(response.data);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      }
-    };
-  
     useEffect(() => {
+      const fetchEvents = async () => {
+        try {
+          const response = await axios.get('/events', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setEvents(response.data.map(event => ({
+            ...event,
+            isBookmarked: Boolean(event.isBookmarked)
+          })));
+        } catch (error) {
+          console.error('Error fetching events:', error);
+        }
+      };
+
       fetchEvents();
     }, [token]);
+
   
     const handleFollowEvent = async (eventId) => {
       try {
@@ -39,6 +42,35 @@ function EventWall({ token: initialToken }) {
         console.error('Error following event:', error);
       }
     }
+
+    const handleBookmarkEvent = async (eventId) => {
+      try {
+        await axios.post(`/bookmark/${eventId}`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        updateEventStatus(eventId, true);
+      } catch (error) {
+        console.error('Error bookmarking event:', error);
+      }
+    };
+
+    const handleUnbookmarkEvent = async (eventId) => {
+      try {
+        await axios.post(`/unbookmark/${eventId}`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        updateEventStatus(eventId, false);
+      } catch (error) {
+        console.error('Error unbookmarking event:', error);
+      }
+    };
+
+    const updateEventStatus = (eventId, isBookmarked) => {
+      setEvents(currentEvents => currentEvents.map(event => 
+        event.id === eventId ? { ...event, isBookmarked: isBookmarked } : event
+      ));
+    };
+
     return (
       <div className="eventWallContainer">
         <Taskbar/>
@@ -48,7 +80,14 @@ function EventWall({ token: initialToken }) {
           {events.length === 0 ? (
             <p>No events nearby.</p>
           ) : (
-            events.map((event) => <EventItem key={event.id} event={event} onClickFunction={() => handleFollowEvent(event.id)} showFollowButton={true}/>)
+            events.map((event) => <EventItem key={event.id} event={event} 
+            onFollow={() => handleFollowEvent(event.id)} 
+            showFollowButton={true}
+            onBookmark={() => handleBookmarkEvent(event.id)}
+            onUnbookmark={() => handleUnbookmarkEvent(event.id)}
+            showBookmarkButton={!event.isBookmarked}
+            showUnbookmarkButton={event.isBookmarked}
+            />)
           )}
         </div>
       </div>

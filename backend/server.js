@@ -166,20 +166,19 @@ app.get('/events/:id', authenticateToken, (req, res) => {
 
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
-
-    const subquery = 'SELECT event_id FROM event_following WHERE user_id = ?';
-    
-    // Get events that is not attended and not created by the user
-    const query = 'SELECT * FROM events WHERE id NOT IN (' + subquery + ') AND host_user_id != ?';
-;
-    
-    // Pass both userId and userId again to prevent SQL injection
-    db.query(query, [userId, userId], (err, results) => {
-        if(err){
+    db.query(`
+    SELECT e.*, 
+           (eb.user_id IS NOT NULL) AS isBookmarked
+    FROM events e
+    LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+    WHERE e.id NOT IN (
+        SELECT event_id FROM event_following WHERE user_id = ?
+    )`, [userId, userId], (err, results) => {
+        if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
-        return res.status(200).send(results);
+        res.status(200).send(results);
     });
 });
 
@@ -412,23 +411,23 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
     const userId = req.userId;
 
     db.query('SELECT event_id FROM event_following WHERE user_id = ?', [userId], (err, results) => {
-        if(err) {
+        if (err) {
             console.error('Error retrieving following:', err);
             return res.status(500).send('Error retrieveing event_following');
         }
         const eventIds = results.map(row => row.event_id);
 
-        if(eventIds.length === 0){
+        if (eventIds.length === 0) {
             return res.status(200).send([]);
         }
         db.query('SELECT * FROM events WHERE id IN (?)', [eventIds], (err, eventResults) => {
-            if(err) {
+            if (err) {
                 console.error('Error retrieiveing events:', err);
                 return res.status(500).send('Error retrieving events');
             }
             res.status(200).send(eventResults);
         });
-    })    
+    })
 });
 //get event's guest
 app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
@@ -514,9 +513,79 @@ app.post('/events/:id/comments', authenticateToken, (req, res) => {
                 user_id: userId,
                 username: userResults[0].username,
                 content: content,
-                created_at: new Date() 
+                created_at: new Date()
             };
             res.status(201).send(newComment);
         });
     });
 });
+
+app.post('/post_event_following/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    db.query('INSERT INTO event_following (user_id, event_id) VALUES (?, ?)', [userId, eventId], (err, results) => {
+        if (err) {
+            console.error('Error following event:', err);
+            return res.status(500).send('Error following event');
+        }
+        db.query('INSERT INTO event_followers (event_id, user_id) VALUES (?, ?)', [eventId, userId], (err, results) => {
+            if (err) {
+                console.error('Error adding event follower:', err);
+                return res.status(500).send('Error adding follower');
+            }
+            return res.status(200).send('Follow successful');
+        });
+    });
+});
+
+app.post('/bookmark/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    // Check if the event exists
+    db.query('SELECT id FROM events WHERE id = ?', [eventId], (err, results) => {
+        if (err) {
+            return res.status(500).send('Database error while checking event');
+        }
+        if (results.length === 0) {
+            return res.status(404).send('Event not found');
+        }
+
+        // Insert bookmark
+        db.query('INSERT INTO bookmark (user_id, event_id) VALUES (?, ?)', [userId, eventId], (err, results) => {
+            if (err) {
+                console.error('Error bookmarking event:', err);
+                return res.status(500).send('Error bookmarking event');
+            }
+            return res.status(200).send({ message: 'Event bookmarked successfully' });
+        });
+    });
+});
+
+app.post('/unbookmark/:id', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const eventId = req.params.id;
+
+    db.query('DELETE FROM bookmark WHERE user_id = ? AND event_id = ?', [userId, eventId], (err, results) => {
+        if (err) {
+            console.error('Error unbookmarking event:', err);
+            return res.status(500).send('Error unbookmarking event');
+        }
+        return res.status(200).send({ message: 'Event unbookmarked successfully' });
+    });
+});
+
+app.get('/bookmarked_events', authenticateToken, (req, res) => {
+    const userId = req.userId;
+
+    db.query('SELECT e.* FROM events e JOIN bookmark eb ON e.id = eb.event_id WHERE eb.user_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving bookmarked events:', err);
+            return res.status(500).send('Error retrieving bookmarked events');
+        }
+        res.status(200).send(results);
+    });
+});
+
+
