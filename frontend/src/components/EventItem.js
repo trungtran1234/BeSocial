@@ -4,7 +4,7 @@ import '../css/event_item.css';
 import { Link, useNavigate } from 'react-router-dom';
 import profileIcon from '../css/images/profileIcon.png';
 
-  function EventItem({ event, onFollow, onDelete, onUnfollow, showDeleteButton, showFollowButton, showUnFollowButton, showBookmarkButton, showUnbookmarkButton, onBookmark, onUnbookmark, currentUserID }) {
+  function EventItem({ event, showGuestButton, onFollow, onDelete, onUnfollow, showDeleteButton, showFollowButton, showUnFollowButton, showBookmarkButton, showUnbookmarkButton, onBookmark, onUnbookmark, currentUserID }) {
     const navigate = useNavigate();
 
     const handleProfileClick = () => {
@@ -57,6 +57,9 @@ import profileIcon from '../css/images/profileIcon.png';
         { showUnbookmarkButton && (
             <button onClick={() => onUnbookmark()}>Unbookmark</button>
         )}
+          {showGuestButton && (
+                <button onClick={() => navigate(`/guest_list/${event.id}`)}>Guest List</button>
+            )} 
 
       </div>
     );

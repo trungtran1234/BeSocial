@@ -477,6 +477,7 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
         });
     })
 });
+
 //get event's guest
 app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
@@ -502,7 +503,6 @@ app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
 });
 
 
-//unattend event
 app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const eventId = req.params.id;
