@@ -44,6 +44,9 @@ import profileIcon from '../css/images/profileIcon.png';
         {showFollowButton && (
                 <button onClick={() => onFollow()}>Attend</button>
             )}
+        {showGuestButton && (
+                <button onClick={() => navigate(`/guest_list/${event.id}`)}>Guest_list</button>
+            )} 
         {showUnFollowButton && (
                 <button onClick={() => onUnfollow()}>Unattend</button>
             )} 
