@@ -1,100 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../css/profile.css';
+import { useParams } from 'react-router-dom';
+import Taskbar from '../components/Taskbar';
+import FollowModal from '../components/FollowModal';  // Ensure this is correctly imported
 
-function Modal({ isOpen, onClose, title, children }) {
-    if (!isOpen) return null;
-
-    return (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
-            justifyContent: 'center', alignItems: 'center'
-        }}>
-            <div style={{
-                background: 'white', padding: '20px', borderRadius: '5px',
-                maxHeight: '70%', overflow: 'auto', width: '300px'
-            }}>
-                <h2>{title}</h2>
-                <button onClick={onClose}>Close</button>
-                <div>{children}</div>
-            </div>
-        </div>
-    );
-}
-
-function UserProfile({ token }) {
-    const [username, setUsername] = useState('');
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [followers, setFollowers] = useState([]);
-    const [following, setFollowing] = useState([]);
-    const [showFollowersModal, setShowFollowersModal] = useState(false);
-    const [showFollowingModal, setShowFollowingModal] = useState(false);
+function UserProfile({ token: initialToken }) {
+    const [userData, setUserData] = useState({
+        username: '',
+        following: [],
+        followers: []
+    });
+    const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const { userId } = useParams();
-    const navigate = useNavigate();
+    const [showFollowingModal, setShowFollowingModal] = useState(false);
+    const [showFollowersModal, setShowFollowersModal] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const headers = { Authorization: `Bearer ${token}` };
-            try {
-                const response = await axios.get(`http://localhost:5000/profile/${userId}`, { headers });
-                if (response.data.redirectTo) {
-                    navigate(response.data.redirectTo, { replace: true });
-                } else {
-                    setUsername(response.data.username);
-                    setFollowers(response.data.followers);
-                    setFollowing(response.data.following);
-                }
-
-                const followStatus = await axios.get(`http://localhost:5000/following/${userId}`, { headers });
-                setIsFollowing(followStatus.data.isFollowing);
-            } catch (error) {
-                console.error('Failed to fetch profile data:', error);
-            }
-        };
-
-        fetchData();
-    }, [userId, token, navigate]);
-
-    const toggleFollow = async () => {
-        const headers = { Authorization: `Bearer ${token}` };
-        const url = `http://localhost:5000/${isFollowing ? 'unfollow' : 'follow'}/${userId}`;
-        try {
-            await axios.post(url, {}, { headers });
-            setIsFollowing(!isFollowing);
-        } catch (error) {
-            console.error('Failed to toggle follow status:', error);
-        }
-    };
+        axios.get(`http://localhost:5000/profile/${userId}`, {  // Ensure the URL correctly includes the userId
+            headers: { Authorization: `Bearer ${token}` },
+        }).then(response => {
+            setUserData(response.data);
+        }).catch(error => {
+            console.error('Error fetching profile:', error);
+        });
+    }, [token, userId]);
 
     return (
         <div>
-            <h1>{username}</h1>
-            <button onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
-            <button onClick={() => setShowFollowingModal(true)}>View Following</button>
-            <button onClick={() => setShowFollowersModal(true)}>View Followers</button>
-            <Modal
+            <Taskbar />
+            <h1>{userData.username}</h1>
+            <button onClick={() => setShowFollowingModal(true)}>Following</button>
+            <FollowModal
                 isOpen={showFollowingModal}
                 onClose={() => setShowFollowingModal(false)}
                 title="Following"
             >
                 <ul>
-                    {following.map((user, index) => (
+                    {userData.following.map((user, index) => (  // Assuming userData.following contains objects with a username property
                         <li key={index}>{user.username}</li>
                     ))}
                 </ul>
-            </Modal>
-            <Modal
+            </FollowModal>
+            <button onClick={() => setShowFollowersModal(true)}>Followers</button>
+            <FollowModal
                 isOpen={showFollowersModal}
                 onClose={() => setShowFollowersModal(false)}
                 title="Followers"
             >
                 <ul>
-                    {followers.map((user, index) => (
+                    {userData.followers.map((user, index) => (  // Assuming userData.followers contains objects with a username property
                         <li key={index}>{user.username}</li>
                     ))}
                 </ul>
-            </Modal>
+            </FollowModal>
         </div>
     );
 }
