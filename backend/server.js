@@ -161,17 +161,14 @@ app.get('/events/:id', authenticateToken, (req, res) => {
     });
 });
 
-
-
-
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
     SELECT e.*,
-           (eb.user_id IS NOT NULL) AS isBookmarked,
-           (ef.user_id IS NOT NULL) AS isAttending
+    (eb.user_id IS NOT NULL) AS isBookmarked,
+    (ef.user_id IS NOT NULL) AS isAttending
     FROM events e
-    LEFT JOIN event_bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+    LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
     LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
     `, [userId, userId], (err, results) => {
         if (err) {
@@ -342,7 +339,7 @@ app.get('/profile', authenticateToken, (req, res) => {
 
 app.get('/profile/:id', authenticateToken, (req, res) => {
     const userId = req.params.id;
-    
+
     if (String(userId) === String(req.userId)) {
         res.json({ redirectTo: '/profile' });
     } else {
@@ -484,23 +481,23 @@ app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
 
     db.query('SELECT user_id FROM event_followers WHERE event_id = ?', [eventId], (err, results) => {
-        if(err) {
+        if (err) {
             console.error('Error retrieving following:', err);
             return res.status(500).send('Error retrieveing event_following');
         }
         const guestId = results.map(row => row.user_id);
 
-        if(guestId.length === 0){
+        if (guestId.length === 0) {
             return res.status(200).send([]);
         }
         db.query('SELECT * FROM users WHERE id IN (?)', [guestId], (err, eventResults) => {
-            if(err) {
+            if (err) {
                 console.error('Error retrieving events:', err);
                 return res.status(500).send('Error retrieving events');
             }
             res.status(200).send(eventResults);
         });
-    })    
+    })
 });
 
 
@@ -670,5 +667,5 @@ app.get('/event_wall', authenticateToken, (req, res) => {
         }
         return res.status(200).send(results);
     }
-);
+    );
 })
