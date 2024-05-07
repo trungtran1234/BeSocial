@@ -38,7 +38,7 @@ function UserProfile({ token: initialToken }) {
             } catch (error) {
                 console.error('Failed to fetch profile data:', error);
             }
-        };
+        };  
         fetchData();
     }, [userId, token, navigate, setUsername, setIsFollowing, isFollowing]);
 
