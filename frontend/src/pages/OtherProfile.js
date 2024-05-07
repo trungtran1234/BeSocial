@@ -55,7 +55,7 @@ function UserProfile({ token: initialToken }) {
     };
 
     return (
-        <div>
+        <div className = "profileContainer">
             <Taskbar />
             <h1>{username}</h1>
             <button onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>

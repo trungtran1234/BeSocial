@@ -6,14 +6,13 @@
 }
 
 .eventsListed {
-    max-width: 100vw;
     overflow: auto; 
     display: flex;
     flex-wrap: wrap; 
-    justify-content: center; 
+    justify-content: left; 
     align-items: center; 
-    row-gap: 10%;
-    column-gap: 4%;
+    row-gap: 4vh;
+    column-gap: 3.6vw;
     padding: 1.5vw; 
     box-sizing: border-box; 
 }

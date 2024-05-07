@@ -400,6 +400,7 @@ app.post('/follow/:id', authenticateToken, (req, res) => {
     });
 });
 
+//get following user
 app.get('/following/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const followingId = req.params.id;
@@ -413,7 +414,7 @@ app.get('/following/:id', authenticateToken, (req, res) => {
     });
 });
 
-
+//Unfollow user
 app.post('/unfollow/:id', authenticateToken, (req, res) => {
     const userId = req.userId;
     const followingId = req.params.id;
@@ -448,11 +449,12 @@ app.post('/post_event_following/:id', authenticateToken, (req, res) => {
                 console.error('Error adding event follower:', err);
                 return res.status(500).send('Error adding follower');
             }
-            return res.status(200).send('Follow successful');
+            return res.status(200).send(userId + ' Sucessfully follow ' + eventId);
         });
     });
 });
 
+//get attending event
 app.get('/get_event_following', authenticateToken, (req, res) => {
     const userId = req.userId;
 
@@ -499,6 +501,7 @@ app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
         });
     })    
 });
+
 
 app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
     const userId = req.userId;

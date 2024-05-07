@@ -69,7 +69,7 @@ function EventFollowing({ token: initialToken }) {
     return (
         <div className="eventWallContainer">
             <Taskbar />
-            <h3> Your Attending Events </h3>
+            <h1> Events You're Attending </h1>
 
             <div className="eventsListed">
                 {events.length === 0 ? (

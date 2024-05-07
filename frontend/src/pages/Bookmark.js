@@ -39,7 +39,7 @@ function BookmarkedEvents({ token: initialToken }) {
   return (
     <div className="eventWallContainer">
         <Taskbar/>
-        <h3> Your Bookmarked Events </h3>
+        <h1> Your Bookmarked Events </h1>
 
         <div className="eventsListed">
             {events.length === 0 ? (

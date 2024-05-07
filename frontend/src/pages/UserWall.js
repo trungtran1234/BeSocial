@@ -48,7 +48,7 @@ function UserWall({ token: initialToken  }) {
     return (
         <div className="eventWallContainer">
             <Taskbar/>
-            <h3> Your Hosting Events </h3>
+            <h1> Your Events </h1>
             <button onClick={() => setShowEventForm(true)}>Create New Event</button>
             {showEventForm && (
                 <div className="popup">

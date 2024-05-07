@@ -16,48 +16,49 @@ import profileIcon from '../css/images/profileIcon.png';
   };
 
     return (
-      <div className="event-item">
-                <h4>
-        <img src={profileIcon} alt="Profile" className="profileIcon" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
-        <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{event.host_username}</span>
-    </h4>
-        <h3>{event.title}</h3>
-        <p>{event.description}</p>
-        <p>
-          <strong>Location: </strong> {event.location}
-        </p>
-        <p>
-          <strong>Capacity:</strong> {event.capacity}
-        </p>
-        <p>
-          <strong>Category:</strong> {event.category}
-        </p>
-        <p>
-          <strong>Start Time:</strong> {new Date(event.start_time).toLocaleString()}
-        </p>
-        <p>
-          <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
-        </p>
-        {showDeleteButton && (
-                <button onClick={() => onDelete()}>Delete</button>
+      <div className = "event-item-container">
+        <div className="event-item-top">       
+          <img src={profileIcon} alt="Profile" className="profileIcon2" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
+          <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{event.host_username}</span>
+        </div>
+        <div className = "event-item-bottom">
+          <h3>{event.title}</h3>
+            <p>{event.description}</p>
+            <p>
+              <strong>Location: </strong> {event.location}
+            </p>
+            <p>
+              <strong>Capacity:</strong> {event.capacity}
+            </p>
+            <p>
+              <strong>Category:</strong> {event.category}
+            </p>
+            <p>
+              <strong>Start Time:</strong> {new Date(event.start_time).toLocaleString()}
+            </p>
+            <p>
+              <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
+            </p>
+            {showDeleteButton && (
+                    <button onClick={() => onDelete()}>Delete</button>
+                )}
+            {showFollowButton && (
+                    <button onClick={() => onFollow()}>Attend</button>
+                )}
+            {showUnFollowButton && (
+                    <button onClick={() => onUnfollow()}>Unattend</button>
+                )} 
+              <button onClick={() => navigate(`/event/${event.id}`)}>View Event</button>
+              { showBookmarkButton && (
+                <button onClick={() => onBookmark()}>Bookmark</button>
             )}
-        {showFollowButton && (
-                <button onClick={() => onFollow()}>Attend</button>
+            { showUnbookmarkButton && (
+                <button onClick={() => onUnbookmark()}>Unbookmark</button>
             )}
-        {showUnFollowButton && (
-                <button onClick={() => onUnfollow()}>Unattend</button>
-            )} 
-          <button onClick={() => navigate(`/event/${event.id}`)}>View Event</button>
-          { showBookmarkButton && (
-            <button onClick={() => onBookmark()}>Bookmark</button>
-        )}
-        { showUnbookmarkButton && (
-            <button onClick={() => onUnbookmark()}>Unbookmark</button>
-        )}
-          {showGuestButton && (
-                <button onClick={() => navigate(`/guest_list/${event.id}`)}>Guest List</button>
-            )} 
-
+              {showGuestButton && (
+                    <button onClick={() => navigate(`/guest_list/${event.id}`)}>Guest List</button>
+                )} 
+        </div>
       </div>
     );
   }
