@@ -1,6 +1,5 @@
 .homeContainer {
     text-align: center;
-    width: 100vw;
     min-height: 100vh;
     max-width: 100vw;
     background-color: rgb(255, 255, 255);
@@ -9,6 +8,7 @@
 .searchContainer {
     height: 35vh;
     width: 100vw;
+    margin-top: 0.5vh;
     background-color: rgb(241, 231, 231);
     font-size: 1vw;
     display: flex;
@@ -18,9 +18,9 @@
 }
 
 .upcomingEventsContainer{
-    min-height: 58vh;
+    min-height: 57.5vh;
     width: 100vw;
-    background-color: rgb(146, 221, 226);
+    background-color: rgb(130, 160, 163);
     font-size: 1vw;
     display: flex;
     flex-direction: column;
@@ -33,15 +33,23 @@
     width: 25%;
     background-color: rgb(241, 231, 231);
     display: flex;
-    justify-content: right;
+    justify-content: center;
     align-items: center;
 }
 
 .searchButton {
+    margin-bottom:2vh;
     font-size: 1vw;
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 85%;
+    border-radius: 1.2vh;
+    border: solid black 0.11vw;
     cursor: pointer;
+    background-color: rgb(185, 212, 224);
+}
+
+.searchButton:hover {
+    background-color: rgb(104, 157, 182);
 }
 
 .popup_search {

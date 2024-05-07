@@ -57,32 +57,39 @@ function UserProfile({ token: initialToken }) {
     return (
         <div className = "profileContainer">
             <Taskbar />
-            <h1>{username}</h1>
-            <button onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
-            <button onClick={() => setShowFollowingModal(true)}>Following</button>
-            <FollowModal
-                isOpen={showFollowingModal}
-                onClose={() => setShowFollowingModal(false)}
-                title="Following"
-            >
-                <ul>
-                    {userData.following.map((user, index) => ( 
-                        <li key={index}>{user.username}</li>
-                    ))}
-                </ul>
-            </FollowModal>
-            <button onClick={() => setShowFollowersModal(true)}>Followers</button>
-            <FollowModal
-                isOpen={showFollowersModal}
-                onClose={() => setShowFollowersModal(false)}
-                title="Followers"
-            >
-                <ul>
-                    {userData.followers.map((user, index) => (
-                        <li key={index}>{user.username}</li>
-                    ))}
-                </ul>
-            </FollowModal>
+            <div className = "innerProfileContainer">
+                <h1>{username}</h1>
+                <div className = "buttonsContainer">
+                    <button className = "profileButton" onClick={toggleFollow}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
+                    <button className = "profileButton" onClick={() => setShowFollowingModal(true)}>Following</button>
+                    <FollowModal
+                        isOpen={showFollowingModal}
+                        onClose={() => setShowFollowingModal(false)}
+                        title="Following"
+                    >
+                        <ul>
+                            {userData.following.map((user, index) => ( 
+                                <li key={index}>{user.username}</li>
+                            ))}
+                        </ul>
+                    </FollowModal>
+                    <button className = "profileButton" onClick={() => setShowFollowersModal(true)}>Followers</button>
+                    <FollowModal
+                        isOpen={showFollowersModal}
+                        onClose={() => setShowFollowersModal(false)}
+                        title="Followers"
+                    >
+                        <ul>
+                            {userData.followers.map((user, index) => (
+                                <li key={index}>{user.username}</li>
+                            ))}
+                        </ul>
+                    </FollowModal>
+                </div>
+                <div className = "profileBottom">
+                    Additional Profile Stuff
+                </div>
+            </div>
         </div>
     );
 }

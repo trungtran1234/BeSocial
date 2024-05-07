@@ -4,6 +4,9 @@ import EventItem from '../components/EventItem';
 import { Link, useNavigate } from 'react-router-dom';
 import EventForm from '../components/EventForm';
 import Taskbar from '../components/Taskbar';
+import '../css/user_wall.css';
+import '../css/general_styles.css';
+
 function UserWall({ token: initialToken  }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
@@ -45,11 +48,28 @@ function UserWall({ token: initialToken  }) {
         }
     };
 
+    //sorting by date (asc), moving null dates to the back (null dates are those with unreasonable years).
+    const sortedEvents = events.slice().sort((a, b) => {
+    const dateA = a.start_time ? new Date(a.start_time) : null;
+    const dateB = b.start_time ? new Date(b.start_time) : null;
+      
+    if (dateA === null && dateB === null) {
+        return 0; 
+        } else if (dateA === null) {
+            return 1; 
+        } else if (dateB === null) {
+            return -1; 
+        } else {
+    
+        return dateA - dateB;
+        }
+    });
+
     return (
         <div className="eventWallContainer">
             <Taskbar/>
             <h1> Your Events </h1>
-            <button onClick={() => setShowEventForm(true)}>Create New Event</button>
+            <button className = "createButton" onClick={() => setShowEventForm(true)}>Create New Event</button>
             {showEventForm && (
                 <div className="popup">
                     <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
@@ -59,7 +79,7 @@ function UserWall({ token: initialToken  }) {
                 {events.length === 0 ? (
                     <p>No events created yet.</p>
                 ) : (
-                    events.map((event) => (
+                    sortedEvents.map((event) => (
                         <EventItem
                             key={event.id}
                             event={event}

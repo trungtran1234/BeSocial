@@ -74,6 +74,23 @@ function BookmarkedEvents({ token: initialToken }) {
     setEvents(prevEvents => prevEvents.map(event => event.id === eventId ? { ...event, isAttending } : event));
   };
 
+  //sorting by date (asc), moving null dates to the back (null dates are those with unreasonable years).
+  const sortedEvents = events.slice().sort((a, b) => {
+    const dateA = a.start_time ? new Date(a.start_time) : null;
+    const dateB = b.start_time ? new Date(b.start_time) : null;
+  
+    if (dateA === null && dateB === null) {
+      return 0; 
+    } else if (dateA === null) {
+      return 1; 
+    } else if (dateB === null) {
+      return -1; 
+    } else {
+
+      return dateA - dateB;
+    }
+  });
+
   return (
     <div className="eventWallContainer">
       <Taskbar />
@@ -83,7 +100,7 @@ function BookmarkedEvents({ token: initialToken }) {
         {events.length === 0 ? (
           <p>No bookmarked events yet.</p>
         ) : (
-          events.map((event) => (
+          sortedEvents.map((event) => (
             <EventItem
               key={event.id}
               event={event}

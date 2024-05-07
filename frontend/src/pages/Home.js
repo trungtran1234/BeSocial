@@ -26,8 +26,7 @@ function Homepage({ token: initialToken }) {
         </div>
       </div>
       <div className='upcomingEventsContainer'>
-              <h1>Local Events</h1>
-              <h3>- We will put events here that are within the same state as the user</h3>
+              <h1>Boxes that redirect to main features</h1>
       </div>
     </div>
   );
