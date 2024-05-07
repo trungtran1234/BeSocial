@@ -167,13 +167,13 @@ app.get('/events/:id', authenticateToken, (req, res) => {
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
-    SELECT e.*, 
-           (eb.user_id IS NOT NULL) AS isBookmarked
+    SELECT e.*,
+           (eb.user_id IS NOT NULL) AS isBookmarked,
+           (ef.user_id IS NOT NULL) AS isAttending
     FROM events e
-    LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
-    WHERE e.id NOT IN (
-        SELECT event_id FROM event_following WHERE user_id = ?
-    )`, [userId, userId], (err, results) => {
+    LEFT JOIN event_bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+    LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+    `, [userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
@@ -181,6 +181,7 @@ app.get('/events', authenticateToken, (req, res) => {
         res.status(200).send(results);
     });
 });
+
 
 
 //get user's events
@@ -659,3 +660,15 @@ app.get('/user/:id/followers', authenticateToken, (req, res) => {
         res.send(results);
     });
 });
+
+app.get('/event_wall', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    db.query('SELECT * FROM events JOIN following ON events.host_user_id = following.following_id WHERE following.id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving events:', err);
+            return res.status(500).send('Error retrieving events');
+        }
+        return res.status(200).send(results);
+    }
+);
+})

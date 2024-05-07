@@ -28,7 +28,7 @@ function Discover({ token: initialToken }) {
       };
 
       fetchEvents();
-    }, [token]);
+    }, [token, events]);
   
     const handleFollowEvent = async (eventId) => {
       try {

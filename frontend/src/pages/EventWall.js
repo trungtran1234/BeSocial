@@ -14,7 +14,7 @@ function EventWall({ token: initialToken }) {
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await axios.get('/events', {
+          const response = await axios.get('/event_wall', {
             headers: { Authorization: `Bearer ${token}` },
           });
           setEvents(response.data.map(event => ({
