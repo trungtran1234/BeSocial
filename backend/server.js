@@ -170,6 +170,7 @@ app.get('/events', authenticateToken, (req, res) => {
     FROM events e
     LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
     LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+    WHERE ef.user_id IS NULL
     `, [userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
@@ -459,21 +460,28 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
     db.query('SELECT event_id FROM event_following WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving following:', err);
-            return res.status(500).send('Error retrieveing event_following');
+            return res.status(500).send('Error retrieving event_following');
         }
         const eventIds = results.map(row => row.event_id);
 
         if (eventIds.length === 0) {
             return res.status(200).send([]);
         }
-        db.query('SELECT * FROM events WHERE id IN (?)', [eventIds], (err, eventResults) => {
+
+        // Extend the query to check bookmark status
+        db.query(`
+            SELECT e.*, 
+            (SELECT COUNT(*) FROM bookmark WHERE event_id = e.id AND user_id = ?) > 0 AS isBookmarked
+            FROM events e
+            WHERE e.id IN (?)
+        `, [userId, eventIds], (err, eventResults) => {
             if (err) {
-                console.error('Error retrieiveing events:', err);
+                console.error('Error retrieving events:', err);
                 return res.status(500).send('Error retrieving events');
             }
             res.status(200).send(eventResults);
         });
-    })
+    });
 });
 
 //get event's guest
@@ -660,12 +668,20 @@ app.get('/user/:id/followers', authenticateToken, (req, res) => {
 
 app.get('/event_wall', authenticateToken, (req, res) => {
     const userId = req.userId;
-    db.query('SELECT * FROM events JOIN following ON events.host_user_id = following.following_id WHERE following.id = ?', [userId], (err, results) => {
+    db.query(`
+        SELECT events.id AS event_id, events.*, 
+        (eb.user_id IS NOT NULL) AS isBookmarked,
+        (ef.user_id IS NOT NULL) AS isAttending
+        FROM events 
+        JOIN following ON events.host_user_id = following.following_id
+        LEFT JOIN bookmark eb ON events.id = eb.event_id AND eb.user_id = ?
+        LEFT JOIN event_following ef ON events.id = ef.event_id AND ef.user_id = ?
+        WHERE following.id = ? AND ef.user_id IS NULL
+    `, [userId, userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
         return res.status(200).send(results);
-    }
-    );
-})
+    });
+});
