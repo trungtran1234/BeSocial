@@ -73,8 +73,7 @@ function Discover({ token: initialToken }) {
     return (
       <div className="eventWallContainer">
         <Taskbar/>
-        <h3> Discover Events </h3>
-        <h3> - Displays all active event postings </h3>
+        <h1> Discover Events </h1>
         <div className="eventsListed">
           {events.length === 0 ? (
             <p>No events nearby.</p>
