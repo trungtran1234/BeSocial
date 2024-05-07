@@ -22,13 +22,14 @@ function Discover({ token: initialToken }) {
             ...event,
             isBookmarked: Boolean(event.isBookmarked)
           })));
+          console.log(response.data);
         } catch (error) {
           console.error('Error fetching events:', error);
         }
       };
 
       fetchEvents();
-    }, [token, events]);
+    }, [token]);
   
     const handleFollowEvent = async (eventId) => {
       try {
