@@ -10,7 +10,7 @@ function EventFollowing({ token: initialToken }) {
 
     const fetchUserEvents = async () => {
         try {
-            const response = await axios.get('/events', {
+            const response = await axios.get('/get_event_following', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEvents(response.data.map(event => ({
