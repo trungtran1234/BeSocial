@@ -32,11 +32,11 @@ function EventWall({ token: initialToken }) {
   
     const handleFollowEvent = async (eventId) => {
       try {
+        console.log('following event', eventId)
         const response = await axios.post(
           `/post_event_following/${eventId}`, null, {
               headers: { Authorization: `Bearer ${token}` },           
         });
-        console.log(response.data)
         setEvents(events.filter(event => event.id !== eventId))
       }catch(error){
         console.error('Error following event:', error);
@@ -52,6 +52,7 @@ function EventWall({ token: initialToken }) {
       } catch (error) {
         console.error('Error bookmarking event:', error);
       }
+      console.log('bookmarking event', eventId);
     };
 
     const handleUnbookmarkEvent = async (eventId) => {

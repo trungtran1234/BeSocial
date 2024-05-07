@@ -19,7 +19,7 @@ function Discover({ token: initialToken }) {
             headers: { Authorization: `Bearer ${token}` },
           });
           setEvents(response.data.map(event => ({
-            ...event,
+            ...event, 
             isBookmarked: Boolean(event.isBookmarked)
           })));
           console.log(response.data);
@@ -37,7 +37,6 @@ function Discover({ token: initialToken }) {
           `/post_event_following/${eventId}`, null, {
               headers: { Authorization: `Bearer ${token}` },           
         });
-        console.log(response.data)
         setEvents(events.filter(event => event.id !== eventId))
       }catch(error){
         console.error('Error following event:', error);
