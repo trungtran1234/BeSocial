@@ -70,6 +70,24 @@ function Discover({ token: initialToken }) {
         event.id === eventId ? { ...event, isBookmarked: isBookmarked } : event
       ));
     };
+
+    //sorting by date (asc), moving null dates to the back (null dates are those with unreasonable years).
+    const sortedEvents = events.slice().sort((a, b) => {
+      const dateA = a.start_time ? new Date(a.start_time) : null;
+      const dateB = b.start_time ? new Date(b.start_time) : null;
+    
+      if (dateA === null && dateB === null) {
+        return 0; 
+      } else if (dateA === null) {
+        return 1; 
+      } else if (dateB === null) {
+        return -1; 
+      } else {
+
+        return dateA - dateB;
+      }
+    });
+
     return (
       <div className="eventWallContainer">
         <Taskbar/>
@@ -78,7 +96,7 @@ function Discover({ token: initialToken }) {
           {events.length === 0 ? (
             <p>No events nearby.</p>
           ) : (
-            events.map((event) => <EventItem key={event.id} event={event} 
+            sortedEvents.map((event) => <EventItem key={event.id} event={event} startTime={event.startTime}
             onFollow={() => handleFollowEvent(event.id)} 
             showFollowButton={true}
             onBookmark={() => handleBookmarkEvent(event.id)}

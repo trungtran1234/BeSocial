@@ -4,9 +4,16 @@
     min-height: 100vh;
     max-width: 100vw;
     background-color: rgb(255, 255, 255);
+    
 }
 
-
+.innerProfileContainer{
+    width: 100vw;
+    min-height: 93vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .modal-backdrop {
     position: fixed;
@@ -34,3 +41,43 @@
     max-height: 200px;
     overflow-y: auto;
 }
+
+.eventsListed {
+    overflow: auto; 
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: left; 
+    align-items: center; 
+    row-gap: 4vh;
+    column-gap: 3.6vw;
+    padding: 1.5vw; 
+    box-sizing: border-box; 
+}
+
+.buttonsContainer{
+    width: 100vw;
+    height: 8vh;
+    align-items: center;
+}
+
+.profileBottom {
+    width: 100vw;
+    height: 76vh;
+}
+
+.profileButton {
+    height: 65%;
+    width: 15%;
+    margin: 0% 2%;
+    margin-bottom:2vh;
+    font-size: 1vw;
+    border-radius: 1.2vh;
+    border: solid black 0.11vw;
+    cursor: pointer;
+    background-color: rgb(185, 212, 224);
+}
+
+.profileButton:hover {
+    background-color: rgb(104, 157, 182);
+}
+
