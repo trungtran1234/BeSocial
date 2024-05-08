@@ -11,7 +11,6 @@ function Discover({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
     const [events, setEvents] = useState([]);
   
-    console.log(token);
     useEffect(() => {
       const fetchEvents = async () => {
         try {
@@ -22,7 +21,6 @@ function Discover({ token: initialToken }) {
             ...event, 
             isBookmarked: Boolean(event.isBookmarked)
           })));
-          console.log(response.data);
         } catch (error) {
           console.error('Error fetching events:', error);
         }

@@ -12,7 +12,7 @@ function EventForm({ onSubmit, onCancel }) {
     startTime: '',
     endTime: '',
   });
-  
+
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -44,10 +44,10 @@ function EventForm({ onSubmit, onCancel }) {
     const day = `${now.getDate()}`.padStart(2, '0');
     const hours = `${now.getHours()}`.padStart(2, '0');
     const minutes = `${now.getMinutes()}`.padStart(2, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
-const today = getCurrentDateTime();
+  const today = getCurrentDateTime();
   return (
     <form onSubmit={handleSubmit} className="event-form">
       <h2>Create New Event</h2>
@@ -101,8 +101,8 @@ const today = getCurrentDateTime();
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        max = "9999-12-31T23:59"
-        min = {today}
+        max="9999-12-31T23:59"
+        min={today}
         required
       />
       <input
@@ -110,8 +110,8 @@ const today = getCurrentDateTime();
         name="endTime"
         value={formData.endTime}
         onChange={handleChange}
-        min = {formData.startTime}
-        max = "9999-12-31T23:59"
+        min={formData.startTime}
+        max="9999-12-31T23:59"
         required
       />
       <div className="form-buttons">

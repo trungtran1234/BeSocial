@@ -4,7 +4,7 @@ import '../css/profile.css';
 import { useParams } from 'react-router-dom';
 import Taskbar from '../components/Taskbar';
 import FollowModal from '../components/FollowModal';
-import EventItem from '../components/EventItem';
+import profileIcon from '../css/images/profileIcon.png';
 
 function UserProfile({ token: initialToken }) {
     const [userData, setUserData] = useState({ username: '', following: [], followers: [] });
@@ -23,6 +23,7 @@ function UserProfile({ token: initialToken }) {
         <div className = "profileContainer">
             <Taskbar />
             <div className = "innerProfileContainer">
+                <img src={profileIcon} className="profileIcon2" />
                 <h1>{userData.username}</h1>
                 <div className = "buttonsContainer">
                     <button className = "profileButton" onClick={() => setShowFollowingModal(true)}>Following</button>
@@ -51,7 +52,7 @@ function UserProfile({ token: initialToken }) {
                     </FollowModal>
                 </div>
                 <div className = "profileBottom">
-                    Additional Profile Stuff
+                    
                 </div>
             </div>
         </div>

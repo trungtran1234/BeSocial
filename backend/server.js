@@ -2,6 +2,7 @@ const express = require('express')
 const mysql = require('mysql2')
 const cors = require('cors')
 const path = require('path')
+const crypto = require('crypto');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 const app = express()
@@ -66,12 +67,14 @@ app.post('/register', async (req, res) => {
             if (err) {
                 res.status(500).send('Error registering user');
             } else {
+                createHashIndex('users','id');
                 const userId = result.insertId; //new user id (cuz new user)
                 const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
                 res.status(201).send({ token });
             }
         }
     );
+    
 });
 
 //login
@@ -141,29 +144,24 @@ app.post('/event_walls', authenticateToken, (req, res) => {
                 return res.status(201).send({ eventId: result.insertId, message: 'Event created successfully' });
             }
         )
+        // createHashIndex('events', 'id')
     });
 });
 
 // get event by id
 app.get('/events/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
-    db.query(`
-        SELECT e.*, c.name AS category_name 
-        FROM events e 
-        JOIN categories c ON e.category_id = c.id 
-        WHERE e.id = ?`,
-        [eventId],
-        (err, results) => {
-            if (err) {
-                console.error('Error retrieving event:', err);
-                return res.status(500).send('Error retrieving event');
-            }
-            if (results.length > 0) {
-                res.status(200).send(results[0]);
-            } else {
-                res.status(404).send('Event not found');
-            }
-        });
+    db.query('SELECT * FROM events FORCE INDEX (PRIMARY) WHERE id = ?', [eventId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving event:', err);
+            return res.status(500).send('Error retrieving event');
+        }
+        if (results.length > 0) {
+            res.status(200).send(results[0]);
+        } else {
+            res.status(404).send('Event not found');
+        }
+    });
 });
 
 
@@ -229,7 +227,57 @@ app.get('/user_events', authenticateToken, (req, res) => {
     });
 });
 
-//delete event
+
+
+//update event
+app.put('/events/:id', authenticateToken, (req, res) => {
+    const eventId = req.params.id;
+    const { title, description, location, capacity, category, startTime, endTime } = req.body;
+
+    db.query(
+        'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
+        [eventId, req.userId],
+        (err, results) => {
+            if (err) {
+                console.error('Error finding event:', err);
+                return res.status(500).send('Error finding event');
+            }
+
+            if (results.length === 0) {
+                return res.status(404).send('Event not found or you are not the host');
+            }
+
+            if (new Date(startTime) >= new Date(endTime)) {
+                return res.status(400).send('Start time must be before end time.');
+            }
+
+            const updatedData = {
+                title,
+                description,
+                location,
+                capacity,
+                category,
+                start_time: startTime,
+                end_time: endTime,
+            };
+
+            db.query(
+                'UPDATE events SET ? WHERE id = ?',
+                [updatedData, eventId],
+                (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error updating event:', updateErr);
+                        return res.status(500).send('Error updating event');
+                    }
+
+                    return res.status(200).send({ message: 'Event updated successfully' });
+                }
+            );
+        }
+    );
+});
+
+//delete event using hashing
 app.delete('/events/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
 
@@ -254,13 +302,75 @@ app.delete('/events/:id', authenticateToken, (req, res) => {
                         console.error('Error deleting event:', deleteErr);
                         return res.status(500).send('Error deleting event');
                     }
+                    // deleteHashIndexRow('events', 'id', (hashIndexErr) => {
+                    //     if (hashIndexErr) {
+                    //         console.error('Error deleting hash index row:', hashIndexErr);
+                    //         return res.status(500).send('Error deleting hash index row');
+                    //     }
 
+                    //     return res.status(200).send({ message: 'Event deleted successfully' });
+                    // });
                     return res.status(200).send({ message: 'Event deleted successfully' });
                 }
             );
         }
     );
 });
+
+// Endpoint to delete an event using hashing
+// app.delete('/events/:id', authenticateToken, (req, res) => {
+//     const hashedEventId = req.params.id;
+
+//     // Search hash index to find original event ID
+//     searchHashIndex('events', 'id', hashedEventId, (searchErr, originalEventId) => {
+//         if (searchErr) {
+//             console.error('Error searching hash index:', searchErr);
+//             return res.status(500).send('Error searching hash index');
+//         }
+
+//         if (!originalEventId) {
+//             return res.status(404).send('Event not found');
+//         }
+
+//         // Verify user's authorization to delete the event
+//         db.query(
+//             'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
+//             [originalEventId, req.userId],
+//             (err, results) => {
+//                 if (err) {
+//                     console.error('Error finding event:', err);
+//                     return res.status(500).send('Error finding event');
+//                 }
+
+//                 if (results.length === 0) {
+//                     return res.status(404).send('Event not found or you are not the host');
+//                 }
+
+//                 // Delete event from the events table
+//                 db.query(
+//                     'DELETE FROM events WHERE id = ?',
+//                     [originalEventId],
+//                     (deleteErr) => {
+//                         if (deleteErr) {
+//                             console.error('Error deleting event:', deleteErr);
+//                             return res.status(500).send('Error deleting event');
+//                         }
+
+//                         // Delete event from the hash index table
+//                         deleteHashIndexRow('events', 'id', hashedEventId, (deleteIndexErr) => {
+//                             if (deleteIndexErr) {
+//                                 console.error('Error deleting event from hash index:', deleteIndexErr);
+//                                 return res.status(500).send('Error deleting event from hash index');
+//                             }
+
+//                             return res.status(200).send({ message: 'Event deleted successfully' });
+//                         });
+//                     }
+//                 );
+//             }
+//         );
+//     });
+// });
 
 app.get('/profile', authenticateToken, (req, res) => {
     const userId = req.userId;
@@ -428,11 +538,11 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
             return res.status(200).send([]);
         }
 
+        // Extend the query to check bookmark status
         db.query(`
-            SELECT e.*, c.name AS category_name,
+            SELECT e.*, 
             (SELECT COUNT(*) FROM bookmark WHERE event_id = e.id AND user_id = ?) > 0 AS isBookmarked
             FROM events e
-            JOIN categories c ON e.category_id = c.id
             WHERE e.id IN (?)
         `, [userId, eventIds], (err, eventResults) => {
             if (err) {
@@ -721,19 +831,108 @@ app.delete('/comments/:commentId/unlike', authenticateToken, (req, res) => {
 });
 
 app.get('/users/:id', (req, res) => {
-    const userId = req.params.id;
-    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+    const hashedUserId = req.params.id;
+
+    // Search hash index to find original user ID
+    searchHashIndex('users', 'id', hashedUserId, (err, originalUserId) => {
         if (err) {
-            console.error('Error retrieving user:', err);
-            return res.status(500).send('Error retrieving user');
+            console.error('Error retrieving user information:', err);
+            return res.status(500).send('Error retrieving user information');
         }
-        if (results.length > 0) {
-            res.status(200).send(results[0]);
-        } else {
-            res.status(404).send('User not found');
+
+        if (!originalUserId) {
+            return res.status(404).send('User not found');
         }
+
+        // Query users table to retrieve user information based on original user ID
+        db.query('SELECT username FROM users WHERE id = ?', [originalUserId], (err, results) => {
+            if (err) {
+                console.error('Error retrieving user:', err);
+                return res.status(500).send('Error retrieving user');
+            }
+
+            if (results.length > 0) {
+                res.status(200).send(results[0]);
+            } else {
+                res.status(404).send('User not found');
+            }
+        });
     });
 });
+
+// Function to hash a value
+function hashValue(value) {
+    const strValue = String(value)
+    return crypto.createHash('sha256').update(strValue).digest();
+}
+
+// Function to create a hash index for the specified column
+function createHashIndex(table, column) {
+    const indexTableName = `${table}_${column}_hash_index`;
+    const createIndexTableQuery = `
+        CREATE TABLE IF NOT EXISTS ${indexTableName} (
+        hashed_value BINARY(32) PRIMARY KEY,
+        original_value VARCHAR(255)
+        )
+  `;
+
+  db.query(createIndexTableQuery, (err) => {
+    if (err) throw err;
+
+    db.query(`SELECT * FROM ${table}`, (err, rows) => {
+      if (err) throw err;
+
+      rows.forEach(row => {
+        const hashedValue = hashValue(row[column]);
+        const insertIndexEntryQuery = `
+            INSERT INTO ${indexTableName} (hashed_value, original_value)
+            VALUES (?, ?)
+        `;
+        db.query(insertIndexEntryQuery, [hashedValue, row[column]], (err) => {
+          if (err) throw err;
+        });
+      });
+
+      console.log(`Hash index created for ${column} column`);
+    });
+  });
+}
+
+// Function to delete a specific row from the hash index table
+function deleteHashIndexRow(table, column, hashedValue, callback) {
+    const indexTableName = `${table}_${column}_hash_index`;
+
+    const deleteQuery = `
+        DELETE IF EXISTS FROM ${indexTableName}
+        WHERE hashed_value = ?
+    `;
+
+    db.query(deleteQuery, [hashedValue], (err, result) => {
+        if (err) {
+            console.error(`Error deleting hash index row for ${hashedValue}:`, err);
+            return callback(err);
+        }
+
+        callback(null);
+    });
+}
+
+// Function to search
+function searchHashIndex(table, column, searchValue) {
+    const indexTableName = `${table}_${column}_hash_index`;
+    const hashedValue = hashValue(searchValue);
+
+    const searchQuery = `
+        SELECT original_value
+        FROM ${indexTableName}
+        WHERE hashed_value = ?
+    `;
+
+    db.query(searchQuery, [hashedValue], (err, results) => {
+        if (err) throw err;
+        console.log(results);
+    });
+}
 
 app.get('/categories', (req, res) => {
     db.query('SELECT id, name FROM categories', (err, results) => {
