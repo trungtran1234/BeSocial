@@ -90,7 +90,7 @@ function EventFollowing({ token: initialToken }) {
 
             <div className="eventsListed">
                 {events.length === 0 ? (
-                    <p>No events attended yet.</p>
+                    <h2>No events attended yet. Check out the Discover page!</h2>
                 ) : (
                     sortedEvents.map((event) => (
                         <EventItem
