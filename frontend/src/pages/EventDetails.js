@@ -53,7 +53,7 @@ const EventDetails = () => {
       });
       const updatedComment = {
         ...response.data,
-        like_count: 0  // Assuming new comments start with 0 likes
+        like_count: 0 
       };
       setComments([...comments, updatedComment]);
       setNewComment('');
@@ -74,7 +74,6 @@ const EventDetails = () => {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         }
       });
-
       const newComments = comments.map(comment => {
         if (comment.id === commentId) {
           return {

@@ -21,8 +21,20 @@ function EventForm({ onSubmit, onCancel }) {
     e.preventDefault();
     onSubmit(formData);
   };
+  function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = `${now.getMonth() + 1}`.padStart(2, '0'); // Adding 1 because months start from 0
+    const day = `${now.getDate()}`.padStart(2, '0');
+    const hours = `${now.getHours()}`.padStart(2, '0');
+    const minutes = `${now.getMinutes()}`.padStart(2, '0');
+    const seconds = `${now.getSeconds()}`.padStart(2, '0');
 
-  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+const today = getCurrentDateTime();
+  console.log(today);
+  console.log(formData.startTime);
   return (
     <form onSubmit={handleSubmit} className="event-form">
       <h2>Create New Event</h2>
@@ -70,7 +82,8 @@ function EventForm({ onSubmit, onCancel }) {
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        max = {formData.endTime}
+        max = "2999-12-31T23:59"
+        min = {today}
         required
       />
       <input
@@ -79,6 +92,7 @@ function EventForm({ onSubmit, onCancel }) {
         value={formData.endTime}
         onChange={handleChange}
         min = {formData.startTime}
+        max = "2999-12-31T23:59"
         required
       />
       <div className="form-buttons">
