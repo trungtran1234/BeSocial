@@ -1,4 +1,4 @@
-  import React from 'react';
+  import React, { useState, useEffect } from 'react';
   import axios from 'axios';
   import '../css/event_item.css';
   import { Link, useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@
 
     function EventItem({ event, showGuestButton, onFollow, onDelete, onUnfollow, showDeleteButton, showFollowButton, showUnFollowButton, showBookmarkButton, showUnbookmarkButton, onBookmark, onUnbookmark, currentUserID }) {
       const navigate = useNavigate();
+      const [hostUsername, setHostUsername] = useState('');
 
       const handleProfileClick = () => {
         if (event.host_user_id === currentUserID) {
@@ -15,11 +16,25 @@
         }
     };
 
+    useEffect(() => {
+      const fetchUsername = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/users/${event.host_user_id}`);
+          setHostUsername(response.data.username);
+        } catch (error) {
+          console.error('Failed to fetch host username:', error);
+          setHostUsername('Unknown User');
+        }
+      };
+  
+      fetchUsername();
+    }, [event.host_user_id]);
+
       return (
         <div className = "event-item-container">
           <div className="event-item-top">       
             <img src={profileIcon} alt="Profile" className="profileIcon2" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
-            <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{event.host_username}</span>
+            <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{hostUsername}</span>
           </div>
           <div className = "event-item-bottom">
             <h3>{event.title}</h3>

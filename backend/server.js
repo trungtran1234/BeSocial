@@ -128,7 +128,6 @@ app.post('/event_walls', authenticateToken, (req, res) => {
             start_time: startTime,
             end_time: endTime,
             host_user_id: req.userId,
-            host_username: results[0].username,
         };
 
         db.query(
@@ -747,6 +746,21 @@ app.delete('/comments/:commentId/unlike', authenticateToken, (req, res) => {
             return res.status(404).send('Like not found or already removed');
         }
         return res.status(200).send('Like removed successfully');
+    });
+});
+
+app.get('/users/:id', (req, res) => {
+    const userId = req.params.id;
+    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving user:', err);
+            return res.status(500).send('Error retrieving user');
+        }
+        if (results.length > 0) {
+            res.status(200).send(results[0]);
+        } else {
+            res.status(404).send('User not found');
+        }
     });
 });
 
