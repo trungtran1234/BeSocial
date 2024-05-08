@@ -104,9 +104,9 @@ app.get('/', authenticateToken, (req, res) => {
 
 //post events
 app.post('/event_walls', authenticateToken, (req, res) => {
-    const { title, description, location, capacity, category, startTime, endTime } = req.body;
+    const { title, description, location, capacity, category_id, startTime, endTime } = req.body;
 
-    if (!title || !description || !location || !capacity || !category || !startTime || !endTime) {
+    if (!title || !description || !location || !capacity || !category_id || !startTime || !endTime) {
         return res.status(400).send('All fields are required.');
     }
     //check start time is before end time
@@ -124,7 +124,7 @@ app.post('/event_walls', authenticateToken, (req, res) => {
             description,
             location,
             capacity,
-            category,
+            category_id,
             start_time: startTime,
             end_time: endTime,
             host_user_id: req.userId,
@@ -147,29 +147,37 @@ app.post('/event_walls', authenticateToken, (req, res) => {
 // get event by id
 app.get('/events/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
-    db.query('SELECT * FROM events WHERE id = ?', [eventId], (err, results) => {
-        if (err) {
-            console.error('Error retrieving event:', err);
-            return res.status(500).send('Error retrieving event');
-        }
-        if (results.length > 0) {
-            res.status(200).send(results[0]);
-        } else {
-            res.status(404).send('Event not found');
-        }
-    });
+    db.query(`
+        SELECT e.*, c.name AS category_name 
+        FROM events e 
+        JOIN categories c ON e.category_id = c.id 
+        WHERE e.id = ?`,
+        [eventId],
+        (err, results) => {
+            if (err) {
+                console.error('Error retrieving event:', err);
+                return res.status(500).send('Error retrieving event');
+            }
+            if (results.length > 0) {
+                res.status(200).send(results[0]);
+            } else {
+                res.status(404).send('Event not found');
+            }
+        });
 });
+
 
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
-    SELECT e.*,
-    (eb.user_id IS NOT NULL) AS isBookmarked,
-    (ef.user_id IS NOT NULL) AS isAttending
-    FROM events e
-    LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
-    LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
-    WHERE ef.user_id IS NULL
+        SELECT e.*, c.name AS category_name,
+        (eb.user_id IS NOT NULL) AS isBookmarked,
+        (ef.user_id IS NOT NULL) AS isAttending
+        FROM events e
+        JOIN categories c ON e.category_id = c.id
+        LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+        LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+        WHERE ef.user_id IS NULL
     `, [userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
@@ -181,31 +189,35 @@ app.get('/events', authenticateToken, (req, res) => {
 
 
 
+
 //get user's events
 app.get('/user_events', authenticateToken, (req, res) => {
-    const { category, location, startTime, endTime } = req.query;
+    let query = `
+    SELECT e.*, c.name AS category_name 
+    FROM events e
+    JOIN categories c ON e.category_id = c.id
+    WHERE e.host_user_id = ?`;
 
-    let query = 'SELECT * FROM events WHERE host_user_id = ?';
-    const queryParams = [req.userId]; // Use req.userId to filter events by user's ID
+    const queryParams = [req.userId];
 
-    if (category) {
-        query += ' AND category = ?';
-        queryParams.push(category);
+    if (req.query.category) {
+        query += ' AND c.name = ?';
+        queryParams.push(req.query.category);
     }
 
-    if (location) {
-        query += ' AND location = ?';
-        queryParams.push(location);
+    if (req.query.location) {
+        query += ' AND e.location = ?';
+        queryParams.push(req.query.location);
     }
 
-    if (startTime) {
-        query += ' AND start_time >= ?';
-        queryParams.push(startTime);
+    if (req.query.startTime) {
+        query += ' AND e.start_time >= ?';
+        queryParams.push(req.query.startTime);
     }
 
-    if (endTime) {
-        query += ' AND end_time <= ?';
-        queryParams.push(endTime);
+    if (req.query.endTime) {
+        query += ' AND e.end_time <= ?';
+        queryParams.push(req.query.endTime);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -216,56 +228,6 @@ app.get('/user_events', authenticateToken, (req, res) => {
 
         return res.status(200).send(results);
     });
-});
-
-
-
-//update event
-app.put('/events/:id', authenticateToken, (req, res) => {
-    const eventId = req.params.id;
-    const { title, description, location, capacity, category, startTime, endTime } = req.body;
-
-    db.query(
-        'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
-        [eventId, req.userId],
-        (err, results) => {
-            if (err) {
-                console.error('Error finding event:', err);
-                return res.status(500).send('Error finding event');
-            }
-
-            if (results.length === 0) {
-                return res.status(404).send('Event not found or you are not the host');
-            }
-
-            if (new Date(startTime) >= new Date(endTime)) {
-                return res.status(400).send('Start time must be before end time.');
-            }
-
-            const updatedData = {
-                title,
-                description,
-                location,
-                capacity,
-                category,
-                start_time: startTime,
-                end_time: endTime,
-            };
-
-            db.query(
-                'UPDATE events SET ? WHERE id = ?',
-                [updatedData, eventId],
-                (updateErr) => {
-                    if (updateErr) {
-                        console.error('Error updating event:', updateErr);
-                        return res.status(500).send('Error updating event');
-                    }
-
-                    return res.status(200).send({ message: 'Event updated successfully' });
-                }
-            );
-        }
-    );
 });
 
 //delete event
@@ -467,11 +429,11 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
             return res.status(200).send([]);
         }
 
-        // Extend the query to check bookmark status
         db.query(`
-            SELECT e.*, 
+            SELECT e.*, c.name AS category_name,
             (SELECT COUNT(*) FROM bookmark WHERE event_id = e.id AND user_id = ?) > 0 AS isBookmarked
             FROM events e
+            JOIN categories c ON e.category_id = c.id
             WHERE e.id IN (?)
         `, [userId, eventIds], (err, eventResults) => {
             if (err) {
@@ -482,6 +444,7 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
         });
     });
 });
+
 
 //get event's guest
 app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
@@ -643,7 +606,13 @@ app.post('/unbookmark/:id', authenticateToken, (req, res) => {
 app.get('/bookmarked_events', authenticateToken, (req, res) => {
     const userId = req.userId;
 
-    db.query('SELECT e.* FROM events e JOIN bookmark eb ON e.id = eb.event_id WHERE eb.user_id = ?', [userId], (err, results) => {
+    db.query(`
+        SELECT e.*, c.name AS category_name 
+        FROM events e
+        JOIN bookmark b ON e.id = b.event_id 
+        JOIN categories c ON e.category_id = c.id
+        WHERE b.user_id = ?
+    `, [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving bookmarked events:', err);
             return res.status(500).send('Error retrieving bookmarked events');
@@ -651,6 +620,7 @@ app.get('/bookmarked_events', authenticateToken, (req, res) => {
         res.status(200).send(results);
     });
 });
+
 
 app.get('/user/:id/following', authenticateToken, (req, res) => {
     const userId = req.params.id;
@@ -679,22 +649,24 @@ app.get('/user/:id/followers', authenticateToken, (req, res) => {
 app.get('/event_wall', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
-        SELECT events.id AS event_id, events.*, 
+        SELECT e.*, c.name AS category_name,
         (eb.user_id IS NOT NULL) AS isBookmarked,
         (ef.user_id IS NOT NULL) AS isAttending
-        FROM events 
-        JOIN following ON events.host_user_id = following.following_id
-        LEFT JOIN bookmark eb ON events.id = eb.event_id AND eb.user_id = ?
-        LEFT JOIN event_following ef ON events.id = ef.event_id AND ef.user_id = ?
+        FROM events e
+        JOIN categories c ON e.category_id = c.id
+        JOIN following ON e.host_user_id = following.following_id
+        LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+        LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
         WHERE following.id = ? AND ef.user_id IS NULL
     `, [userId, userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
-        return res.status(200).send(results);
+        res.status(200).send(results);
     });
 });
+
 
 app.post('/comments/:commentId/like', authenticateToken, (req, res) => {
     const userId = req.userId;
@@ -764,3 +736,12 @@ app.get('/users/:id', (req, res) => {
     });
 });
 
+app.get('/categories', (req, res) => {
+    db.query('SELECT id, name FROM categories', (err, results) => {
+        if (err) {
+            console.error('Error fetching categories:', err);
+            return res.status(500).send('Error fetching categories');
+        }
+        res.send(results);
+    });
+});

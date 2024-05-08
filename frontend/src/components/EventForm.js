@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../css/event_form.css';
 
 function EventForm({ onSubmit, onCancel }) {
@@ -7,15 +8,30 @@ function EventForm({ onSubmit, onCancel }) {
     description: '',
     location: '',
     capacity: '',
-    category: '',
+    category_id: '',
     startTime: '',
     endTime: '',
   });
+  
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/categories');
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,17 +40,14 @@ function EventForm({ onSubmit, onCancel }) {
   function getCurrentDateTime() {
     const now = new Date();
     const year = now.getFullYear();
-    const month = `${now.getMonth() + 1}`.padStart(2, '0'); // Adding 1 because months start from 0
+    const month = `${now.getMonth() + 1}`.padStart(2, '0');
     const day = `${now.getDate()}`.padStart(2, '0');
     const hours = `${now.getHours()}`.padStart(2, '0');
     const minutes = `${now.getMinutes()}`.padStart(2, '0');
-    const seconds = `${now.getSeconds()}`.padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
 const today = getCurrentDateTime();
-  console.log(today);
-  console.log(formData.startTime);
   return (
     <form onSubmit={handleSubmit} className="event-form">
       <h2>Create New Event</h2>
@@ -69,20 +82,26 @@ const today = getCurrentDateTime();
         onChange={handleChange}
         required
       />
-      <input
-        type="text"
-        name="category"
-        placeholder="Category"
-        value={formData.category}
-        onChange={handleChange}
-        required
-      />
+      <div>
+        <label htmlFor="category_id">Category:</label>
+        <select
+          name="category_id"
+          value={formData.category_id}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select a Category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>{category.name}</option>
+          ))}
+        </select>
+      </div>
       <input
         type="datetime-local"
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        max = "2999-12-31T23:59"
+        max = "9999-12-31T23:59"
         min = {today}
         required
       />
@@ -92,7 +111,7 @@ const today = getCurrentDateTime();
         value={formData.endTime}
         onChange={handleChange}
         min = {formData.startTime}
-        max = "2999-12-31T23:59"
+        max = "9999-12-31T23:59"
         required
       />
       <div className="form-buttons">
