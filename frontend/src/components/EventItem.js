@@ -21,6 +21,7 @@
         try {
           const response = await axios.get(`http://localhost:5000/users/${event.host_user_id}`);
           setHostUsername(response.data.username);
+          console.log('Host username:', response.data.username);
         } catch (error) {
           console.error('Failed to fetch host username:', error);
           setHostUsername('Unknown User');
@@ -46,7 +47,7 @@
                 <strong>Capacity:</strong> {event.capacity}
               </p>
               <p>
-                <strong>Category:</strong> {event.category}
+              <p><strong>Category:</strong> {event.category_name || 'No Category'}</p>
               </p>
               <p>
                 <strong>Start Time:</strong> {new Date(event.start_time).toLocaleString()}
