@@ -46,7 +46,7 @@
                 <strong>Capacity:</strong> {event.capacity}
               </p>
               <p>
-                <strong>Category:</strong> {event.category}
+              <p><strong>Category:</strong> {event.category_name || 'No Category'}</p>
               </p>
               <p>
                 <strong>Start Time:</strong> {new Date(event.start_time).toLocaleString()}
