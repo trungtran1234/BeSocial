@@ -530,7 +530,16 @@ app.post('/post_event_unfollowing/:id', authenticateToken, (req, res) => {
 
 app.get('/events/:id/comments', authenticateToken, (req, res) => {
     const eventId = req.params.id;
-    db.query('SELECT comments.*, users.username AS username FROM comments JOIN users ON comments.user_id = users.id WHERE event_id = ?', [eventId], (err, results) => {
+    const userId = req.userId;
+    db.query(`
+        SELECT comments.*, users.username AS username, COUNT(comment_likes.id) AS like_count,
+        EXISTS(SELECT 1 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS isLiked
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        LEFT JOIN comment_likes ON comments.id = comment_likes.comment_id
+        WHERE event_id = ?
+        GROUP BY comments.id
+    `, [userId, eventId], (err, results) => {
         if (err) {
             console.error('Error retrieving comments:', err);
             return res.status(500).send('Error retrieving comments');
@@ -538,6 +547,8 @@ app.get('/events/:id/comments', authenticateToken, (req, res) => {
         res.status(200).send(results);
     });
 });
+
+
 
 app.post('/events/:id/comments', authenticateToken, (req, res) => {
     const eventId = req.params.id;
@@ -685,3 +696,57 @@ app.get('/event_wall', authenticateToken, (req, res) => {
         return res.status(200).send(results);
     });
 });
+
+app.post('/comments/:commentId/like', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const commentId = req.params.commentId;
+
+    const query = 'INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)';
+    db.query(query, [commentId, userId], (err, result) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(409).send('Comment already liked by this user');
+            }
+            console.error('Error liking comment:', err);
+            return res.status(500).send('Error liking comment');
+        }
+        return res.status(201).send('Comment liked successfully');
+    });
+});
+
+app.delete('/comments/:commentId/like', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const commentId = req.params.commentId;
+
+    const query = 'DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?';
+    db.query(query, [commentId, userId], (err, result) => {
+        if (err) {
+            console.error('Error unliking comment:', err);
+            return res.status(500).send('Error unliking comment');
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Like not found');
+        }
+        return res.status(200).send('Like removed successfully');
+    });
+});
+
+app.delete('/comments/:commentId/unlike', authenticateToken, (req, res) => {
+    const userId = req.userId;
+    const commentId = req.params.commentId;
+
+    console.log(`Attempting to unlike: Comment ID ${commentId} by User ID ${userId}`);
+
+    const query = 'DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?';
+    db.query(query, [commentId, userId], (err, result) => {
+        if (err) {
+            console.error('Error unliking comment:', err);
+            return res.status(500).send('Error unliking comment');
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Like not found or already removed');
+        }
+        return res.status(200).send('Like removed successfully');
+    });
+});
+
