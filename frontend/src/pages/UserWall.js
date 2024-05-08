@@ -69,7 +69,7 @@ function UserWall({ token: initialToken  }) {
         <div className="eventWallContainer">
             <Taskbar/>
             <h1> Your Events </h1>
-            <button className = "createButton" onClick={() => setShowEventForm(true)}>Create New Event</button>
+            <button className = "createButton" onClick={() => setShowEventForm(true)}>Host New Event</button>
             {showEventForm && (
                 <div className="popup">
                     <EventForm onSubmit={handleCreateEvent} onCancel={() => setShowEventForm(false)} />
@@ -77,7 +77,7 @@ function UserWall({ token: initialToken  }) {
             )}
             <div className="eventsListed">
                 {events.length === 0 ? (
-                    <p>No events created yet.</p>
+                    <h2>No events hosted yet. Create one above!</h2>
                 ) : (
                     sortedEvents.map((event) => (
                         <EventItem

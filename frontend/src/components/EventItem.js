@@ -33,7 +33,7 @@
       return (
         <div className = "event-item-container">
           <div className="event-item-top">       
-            <img src={profileIcon} alt="Profile" className="profileIcon2" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
+            <img src={profileIcon} alt="Profile" className="profileIcon3" onClick={() => navigate(`/profile/${event.host_user_id}`)} />
             <span onClick={() => navigate(`/profile/${event.host_user_id}`)} style={{ cursor: 'pointer' }}>{hostUsername}</span>
           </div>
           <div className = "event-item-bottom">

@@ -16,4 +16,8 @@
     padding: 1.5vw; 
     box-sizing: border-box; 
 }
+
+.centeredError {
+    justify-content: center; 
+}
   

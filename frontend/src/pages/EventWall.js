@@ -95,7 +95,7 @@ function EventWall({ token: initialToken }) {
         <h1> Event Wall </h1>
         <div className="eventsListed">
           {events.length === 0 ? (
-            <p>No events nearby.</p>
+            <h2>No events here. Follow some users first!</h2>
           ) : (
             sortedEvents.map((event) => <EventItem key={event.id} event={event} 
             onFollow={() => handleFollowEvent(event.id)} 

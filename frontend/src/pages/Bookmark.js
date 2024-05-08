@@ -98,7 +98,7 @@ function BookmarkedEvents({ token: initialToken }) {
 
       <div className="eventsListed">
         {events.length === 0 ? (
-          <p>No bookmarked events yet.</p>
+          <h2>No bookmarked events yet.</h2>
         ) : (
           sortedEvents.map((event) => (
             <EventItem
