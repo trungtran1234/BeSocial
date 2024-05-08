@@ -2,6 +2,7 @@ const express = require('express')
 const mysql = require('mysql2')
 const cors = require('cors')
 const path = require('path')
+const crypto = require('crypto');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 const app = express()
@@ -58,9 +59,7 @@ const authenticateToken = (req, res, next) => {
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    db.query(
-        'INSERT INTO users (username, password) VALUES (?, ?)',
+    db.query('INSERT INTO users (username, password) VALUES (?, ?)',
         [username, hashedPassword],
         (err, result) => {
             if (err) {
@@ -68,10 +67,11 @@ app.post('/register', async (req, res) => {
             } else {
                 const userId = result.insertId; //new user id (cuz new user)
                 const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+                createHashIndex('users', 'id', userId);
                 res.status(201).send({ token });
             }
-        }
-    );
+    })
+    
 });
 
 //login
@@ -118,7 +118,7 @@ app.post('/event_walls', authenticateToken, (req, res) => {
             console.error('Error finding user:', err);
             return res.status(500).send('Error finding user');
         }
-
+        
         const eventData = {
             title,
             description,
@@ -129,7 +129,6 @@ app.post('/event_walls', authenticateToken, (req, res) => {
             end_time: endTime,
             host_user_id: req.userId,
         };
-
         db.query(
             'INSERT INTO events SET ?',
             eventData,
@@ -138,7 +137,9 @@ app.post('/event_walls', authenticateToken, (req, res) => {
                     console.error('Error creating event:', err);
                     return res.status(500).send('Error creating event');
                 }
+                createHashIndex('events','id', result.insertId)
                 return res.status(201).send({ eventId: result.insertId, message: 'Event created successfully' });
+            
             }
         )
     });
@@ -147,24 +148,39 @@ app.post('/event_walls', authenticateToken, (req, res) => {
 // get event by id
 app.get('/events/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
-    db.query(`
-        SELECT e.*, c.name AS category_name 
-        FROM events e 
-        JOIN categories c ON e.category_id = c.id 
-        WHERE e.id = ?`,
-        [eventId],
-        (err, results) => {
-            if (err) {
-                console.error('Error retrieving event:', err);
-                return res.status(500).send('Error retrieving event');
-            }
-            if (results.length > 0) {
-                res.status(200).send(results[0]);
-            } else {
-                res.status(404).send('Event not found');
-            }
-        });
+
+    // Search hash index to find original event ID
+    searchHashIndex('events', 'id', eventId, (err, originalEventId) => {
+        if (err) {
+            console.error('Error retrieving event:', err);
+            return res.status(500).send('Error retrieving event');
+        }
+
+        if (!originalEventId) {
+            return res.status(404).send('Event not found');
+        }
+
+        db.query(`
+            SELECT e.*, c.name AS category_name 
+            FROM events e 
+            JOIN categories c ON e.category_id = c.id 
+            WHERE e.id = ?`,
+            [originalEventId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error retrieving event:', err);
+                    return res.status(500).send('Error retrieving event');
+                }
+
+                if (results.length > 0) {
+                    res.status(200).send(results[0]);
+                } else {
+                    res.status(404).send('Event not found');
+                }
+            });
+    });
 });
+
 
 
 app.get('/events', authenticateToken, (req, res) => {
@@ -186,8 +202,6 @@ app.get('/events', authenticateToken, (req, res) => {
         res.status(200).send(results);
     });
 });
-
-
 
 
 //get user's events
@@ -233,7 +247,6 @@ app.get('/user_events', authenticateToken, (req, res) => {
 //delete event
 app.delete('/events/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
-
     db.query(
         'SELECT * FROM events WHERE id = ? AND host_user_id = ?',
         [eventId, req.userId],
@@ -255,10 +268,17 @@ app.delete('/events/:id', authenticateToken, (req, res) => {
                         console.error('Error deleting event:', deleteErr);
                         return res.status(500).send('Error deleting event');
                     }
-
-                    return res.status(200).send({ message: 'Event deleted successfully' });
+                    deleteHashIndexRow('events', 'id', eventId, (hashIndexErr) => {
+                        if (hashIndexErr) {
+                            console.error('Error deleting hash index row:', hashIndexErr);
+                            return res.status(500).send('Error deleting hash index row');
+                        }
+        
+                        return res.status(200).send({ message: 'Event and hash deleted successfully' });
+                    });
                 }
-            );
+            ); 
+            
         }
     );
 });
@@ -300,45 +320,60 @@ app.get('/profile', authenticateToken, (req, res) => {
 
 
 app.get('/profile/:id', authenticateToken, (req, res) => {
-    const userId = req.params.id;
+    const hashedUserId = req.params.id;
 
-    if (String(userId) === String(req.userId)) {
-        res.json({ redirectTo: '/profile' });
-    } else {
-        db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
-            if (err) {
-                return res.status(500).send('Error retrieving user');
-            }
-            if (results.length === 0) {
-                return res.status(404).send('User not found');
-            }
+    // Search hash index to find original user ID
+    searchHashIndex('users', 'id', hashedUserId, (err, originalUserId) => {
+        if (err) {
+            console.error('Error retrieving user profile:', err);
+            return res.status(500).send('Error retrieving user profile');
+        }
 
-            const username = results[0].username;
-            const userData = { username, following: [], followers: [] };
-            db.query(`
-                SELECT users.id, users.username 
-                FROM users 
-                JOIN following ON users.id = following.following_id 
-                WHERE following.id = ?`, [userId], (err, followingResults) => {
+        if (!originalUserId) {
+            return res.status(404).send('User not found');
+        }
+
+        const userId = originalUserId;
+
+        if (String(userId) === String(req.userId)) {
+            res.json({ redirectTo: '/profile' });
+        } else {
+            db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
                 if (err) {
-                    return res.status(500).send('Error retrieving following list');
+                    return res.status(500).send('Error retrieving user');
                 }
-                userData.following = followingResults.map(f => ({ id: f.id, username: f.username }));
+                if (results.length === 0) {
+                    return res.status(404).send('User not found');
+                }
+
+                const username = results[0].username;
+                const userData = { username, following: [], followers: [] };
                 db.query(`
                     SELECT users.id, users.username 
                     FROM users 
-                    JOIN followers ON users.id = followers.follower_id 
-                    WHERE followers.id = ?`, [userId], (err, followersResults) => {
+                    JOIN following ON users.id = following.following_id 
+                    WHERE following.id = ?`, [userId], (err, followingResults) => {
                     if (err) {
-                        return res.status(500).send('Error retrieving followers list');
+                        return res.status(500).send('Error retrieving following list');
                     }
-                    userData.followers = followersResults.map(f => ({ id: f.id, username: f.username }));
-                    res.status(200).json(userData);
+                    userData.following = followingResults.map(f => ({ id: f.id, username: f.username }));
+                    db.query(`
+                        SELECT users.id, users.username 
+                        FROM users 
+                        JOIN followers ON users.id = followers.follower_id 
+                        WHERE followers.id = ?`, [userId], (err, followersResults) => {
+                        if (err) {
+                            return res.status(500).send('Error retrieving followers list');
+                        }
+                        userData.followers = followersResults.map(f => ({ id: f.id, username: f.username }));
+                        res.status(200).json(userData);
+                    });
                 });
             });
-        });
-    }
+        }
+    });
 });
+
 
 
 app.post('/follow/:id', authenticateToken, (req, res) => {
@@ -514,6 +549,7 @@ app.get('/events/:id/comments', authenticateToken, (req, res) => {
 
 app.post('/events/:id/comments', authenticateToken, (req, res) => {
     const eventId = req.params.id;
+    const hashedEventId = hashValue(eventId)
     const { content } = req.body;
     const userId = req.userId
 
@@ -657,8 +693,8 @@ app.get('/event_wall', authenticateToken, (req, res) => {
         JOIN following ON e.host_user_id = following.following_id
         LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
         LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
-        WHERE following.id = ? AND ef.user_id IS NULL
-    `, [userId, userId, userId], (err, results) => {
+        WHERE following.id = ? AND ef.user_id IS NULL AND e.host_user_id <> ?
+    `, [userId, userId, userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
@@ -671,7 +707,6 @@ app.get('/event_wall', authenticateToken, (req, res) => {
 app.post('/comments/:commentId/like', authenticateToken, (req, res) => {
     const userId = req.userId;
     const commentId = req.params.commentId;
-
     const query = 'INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)';
     db.query(query, [commentId, userId], (err, result) => {
         if (err) {
@@ -723,17 +758,24 @@ app.delete('/comments/:commentId/unlike', authenticateToken, (req, res) => {
 
 app.get('/users/:id', (req, res) => {
     const userId = req.params.id;
-    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
+    searchHashIndex('users','id', userId, (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
             return res.status(500).send('Error retrieving user');
         }
-        if (results.length > 0) {
-            res.status(200).send(results[0]);
-        } else {
-            res.status(404).send('User not found');
-        }
-    });
+        db.query('SELECT username FROM users WHERE id = ?', [results], (err, results) => {
+            if (err) {
+                console.error('Error retrieving user:', err);
+                return res.status(500).send('Error retrieving user');
+            }
+            if (results.length > 0) {
+                res.status(200).send(results[0]);
+            } else {
+                res.status(404).send('User not found');
+            }
+        });
+    })
+    
 });
 
 app.get('/categories', (req, res) => {
@@ -745,3 +787,78 @@ app.get('/categories', (req, res) => {
         res.send(results);
     });
 });
+
+// Function to hash a value
+function hashValue(value) {
+    const strValue = String(value)
+    return crypto.createHash('sha256').update(strValue).digest();
+}
+
+// Function to create a hash index for the specified column
+function createHashIndex(table, column, value) {
+    const indexTableName = `${table}_${column}_hash_index`;
+    const createIndexTableQuery = `
+        CREATE TABLE IF NOT EXISTS ${indexTableName} (
+        hashed_value BINARY(32) PRIMARY KEY,
+        original_value VARCHAR(255)
+        )
+  `;
+    db.query(createIndexTableQuery, (err) => {
+        if (err) throw err;
+        const hashedValue = hashValue(value);
+        const insertIndexEntryQuery = `
+            INSERT INTO ${indexTableName} (hashed_value, original_value)
+            VALUES (?, ?)
+        `;
+        db.query(insertIndexEntryQuery, [hashedValue, value], (err) => {
+            if (err) throw err;
+        });
+        
+        console.log(`Hash index created for ${column} column`)
+    });
+}
+
+// Function to delete a specific row from the hash index table
+function deleteHashIndexRow(table, column, deleteValue, callback) {
+    const indexTableName = `${table}_${column}_hash_index`;
+    const hashedValue = hashValue(deleteValue);
+    const deleteQuery = `
+        DELETE FROM ${indexTableName}
+        WHERE hashed_value = ?
+    `;
+
+    db.query(deleteQuery, [hashedValue], (err, result) => {
+        if (err) {
+            console.error(`Error deleting hash index row for ${hashedValue}:`, err);
+            return callback(err);
+        }
+
+        callback(null);
+    });
+}
+
+// Function to search using hash index
+function searchHashIndex(table, column, searchValue, callback) {
+    const indexTableName = `${table}_${column}_hash_index`;
+    const hashedValue = hashValue(searchValue);
+
+    const searchQuery = `
+        SELECT original_value
+        FROM ${indexTableName}
+        WHERE hashed_value = ?
+    `;
+
+    db.query(searchQuery, [hashedValue], (err, results) => {
+        if (err) {
+            console.error(`Error searching hash index for ${searchValue}:`, err);
+            return callback(err, null);
+        }
+
+        if (results.length > 0) {
+            const originalValue = results[0].original_value;
+            callback(null, originalValue);
+        } else {
+            callback(null, null); // Hashed value not found in the index
+        }
+    });
+}

@@ -12,8 +12,9 @@ function Taskbar({ token: initialToken }) {
     const handleLogout = () => {
         localStorage.removeItem('authToken');
         setToken(null);
+        navigate('/login');
         window.location.reload();
-        navigate('/login'); // Changed to use navigate for SPA behavior
+         // Changed to use navigate for SPA behavior
     };
 
     const handleNavigation = (path) => {

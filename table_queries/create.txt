@@ -74,3 +74,13 @@ CREATE TABLE bookmark (
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
+
+CREATE TABLE events_id_hash_index(
+    hashed_value binary(32),
+    original varchar(255),
+);
+
+CREATE TABLE users_id_hash_index(
+    hashed_value binary(32),
+    original varchar(255),
+);
