@@ -107,9 +107,9 @@ app.get('/', authenticateToken, (req, res) => {
 
 //post events
 app.post('/event_walls', authenticateToken, (req, res) => {
-    const { title, description, location, capacity, category_id, startTime, endTime } = req.body;
+    const { title, description, location, capacity, category, startTime, endTime } = req.body;
 
-    if (!title || !description || !location || !capacity || !category_id || !startTime || !endTime) {
+    if (!title || !description || !location || !capacity || !category || !startTime || !endTime) {
         return res.status(400).send('All fields are required.');
     }
     //check start time is before end time
@@ -127,7 +127,7 @@ app.post('/event_walls', authenticateToken, (req, res) => {
             description,
             location,
             capacity,
-            category_id,
+            category,
             start_time: startTime,
             end_time: endTime,
             host_user_id: req.userId,
@@ -168,13 +168,13 @@ app.get('/events/:id', authenticateToken, (req, res) => {
 app.get('/events', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
-        SELECT e.*, c.name AS category_name,
-        (eb.user_id IS NOT NULL) AS isBookmarked,
-        (ef.user_id IS NOT NULL) AS isAttending
-        FROM events e
-        JOIN categories c ON e.category_id = c.id
-        LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
-        LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+    SELECT e.*,
+    (eb.user_id IS NOT NULL) AS isBookmarked,
+    (ef.user_id IS NOT NULL) AS isAttending
+    FROM events e
+    LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
+    LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+    WHERE ef.user_id IS NULL
     `, [userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
@@ -186,35 +186,31 @@ app.get('/events', authenticateToken, (req, res) => {
 
 
 
-
 //get user's events
 app.get('/user_events', authenticateToken, (req, res) => {
-    let query = `
-    SELECT e.*, c.name AS category_name 
-    FROM events e
-    JOIN categories c ON e.category_id = c.id
-    WHERE e.host_user_id = ?`;
+    const { category, location, startTime, endTime } = req.query;
 
-    const queryParams = [req.userId];
+    let query = 'SELECT * FROM events WHERE host_user_id = ?';
+    const queryParams = [req.userId]; // Use req.userId to filter events by user's ID
 
-    if (req.query.category) {
-        query += ' AND c.name = ?';
-        queryParams.push(req.query.category);
+    if (category) {
+        query += ' AND category = ?';
+        queryParams.push(category);
     }
 
-    if (req.query.location) {
-        query += ' AND e.location = ?';
-        queryParams.push(req.query.location);
+    if (location) {
+        query += ' AND location = ?';
+        queryParams.push(location);
     }
 
-    if (req.query.startTime) {
-        query += ' AND e.start_time >= ?';
-        queryParams.push(req.query.startTime);
+    if (startTime) {
+        query += ' AND start_time >= ?';
+        queryParams.push(startTime);
     }
 
-    if (req.query.endTime) {
-        query += ' AND e.end_time <= ?';
-        queryParams.push(req.query.endTime);
+    if (endTime) {
+        query += ' AND end_time <= ?';
+        queryParams.push(endTime);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -554,7 +550,6 @@ app.get('/get_event_following', authenticateToken, (req, res) => {
     });
 });
 
-
 //get event's guest
 app.get('/get_event_follower/:id', authenticateToken, (req, res) => {
     const eventId = req.params.id;
@@ -715,13 +710,7 @@ app.post('/unbookmark/:id', authenticateToken, (req, res) => {
 app.get('/bookmarked_events', authenticateToken, (req, res) => {
     const userId = req.userId;
 
-    db.query(`
-        SELECT e.*, c.name AS category_name 
-        FROM events e
-        JOIN bookmark b ON e.id = b.event_id 
-        JOIN categories c ON e.category_id = c.id
-        WHERE b.user_id = ?
-    `, [userId], (err, results) => {
+    db.query('SELECT e.* FROM events e JOIN bookmark eb ON e.id = eb.event_id WHERE eb.user_id = ?', [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving bookmarked events:', err);
             return res.status(500).send('Error retrieving bookmarked events');
@@ -729,7 +718,6 @@ app.get('/bookmarked_events', authenticateToken, (req, res) => {
         res.status(200).send(results);
     });
 });
-
 
 app.get('/user/:id/following', authenticateToken, (req, res) => {
     const userId = req.params.id;
@@ -758,24 +746,22 @@ app.get('/user/:id/followers', authenticateToken, (req, res) => {
 app.get('/event_wall', authenticateToken, (req, res) => {
     const userId = req.userId;
     db.query(`
-        SELECT e.*, c.name AS category_name,
+        SELECT events.id AS event_id, events.*, 
         (eb.user_id IS NOT NULL) AS isBookmarked,
         (ef.user_id IS NOT NULL) AS isAttending
-        FROM events e
-        JOIN categories c ON e.category_id = c.id
-        JOIN following ON e.host_user_id = following.following_id
-        LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
-        LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+        FROM events 
+        JOIN following ON events.host_user_id = following.following_id
+        LEFT JOIN bookmark eb ON events.id = eb.event_id AND eb.user_id = ?
+        LEFT JOIN event_following ef ON events.id = ef.event_id AND ef.user_id = ?
         WHERE following.id = ? AND ef.user_id IS NULL
     `, [userId, userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
             return res.status(500).send('Error retrieving events');
         }
-        res.status(200).send(results);
+        return res.status(200).send(results);
     });
 });
-
 
 app.post('/comments/:commentId/like', authenticateToken, (req, res) => {
     const userId = req.userId;
@@ -933,13 +919,3 @@ function searchHashIndex(table, column, searchValue) {
         console.log(results);
     });
 }
-
-app.get('/categories', (req, res) => {
-    db.query('SELECT id, name FROM categories', (err, results) => {
-        if (err) {
-            console.error('Error fetching categories:', err);
-            return res.status(500).send('Error fetching categories');
-        }
-        res.send(results);
-    });
-});
