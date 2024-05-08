@@ -17,14 +17,14 @@ const EventDetails = () => {
   useEffect(() => {
     const fetchEventAndComments = async () => {
       try {
-        const eventResponse = await axios.get(`http://localhost:5000/events/${id}`, {
+        const eventResponse = await axios.get(`http://localhost:3001/events/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           }
         });
         setEvent(eventResponse.data);
 
-        const commentsResponse = await axios.get(`http://localhost:5000/events/${id}/comments`, {
+        const commentsResponse = await axios.get(`http://localhost:3001/events/${id}/comments`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           }
@@ -44,7 +44,7 @@ const EventDetails = () => {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      const response = await axios.post(`http://localhost:5000/events/${id}/comments`, {
+      const response = await axios.post(`http://localhost:3001/events/${id}/comments`, {
         content: newComment,
       }, {
         headers: {
@@ -64,7 +64,7 @@ const EventDetails = () => {
 
   const handleToggleLike = async (commentId, isLiked) => {
     const method = isLiked ? 'delete' : 'post';
-    const endpoint = `http://localhost:5000/comments/${commentId}/${isLiked ? 'unlike' : 'like'}`;
+    const endpoint = `http://localhost:3001/comments/${commentId}/${isLiked ? 'unlike' : 'like'}`;
 
     try {
       await axios({

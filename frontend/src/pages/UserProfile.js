@@ -14,7 +14,7 @@ function UserProfile({ token: initialToken }) {
     const [showFollowersModal, setShowFollowersModal] = useState(false);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/profile`, { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`http://localhost:3001/profile`, { headers: { Authorization: `Bearer ${token}` } })
             .then(response => setUserData(response.data))
             .catch(error => console.error('Error fetching profile:', error));
     }, [token, userId]);

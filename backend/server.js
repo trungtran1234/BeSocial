@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, 'build')))
 app.use(cors())
 app.use(express.json())
 
-const port = 5000
+const port = 3001
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -27,6 +27,7 @@ db.connect((err) => {
     }
     console.log('Connected to the database');
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)

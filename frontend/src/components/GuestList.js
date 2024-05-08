@@ -13,7 +13,7 @@ function GuestList({ token: initialToken }) {
 
   const fetchGuestList = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/get_event_follower/${id}`, {
+      const response = await axios.get(`http://localhost:3001/get_event_follower/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("eventId " + id);

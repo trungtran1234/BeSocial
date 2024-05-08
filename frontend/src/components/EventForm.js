@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/event_form.css';
 
 function EventForm({ onSubmit, onCancel }) {
@@ -12,17 +12,26 @@ function EventForm({ onSubmit, onCancel }) {
     endTime: '',
   });
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Fetch the categories from the backend API
+    fetch('/api/categories') // Adjust this URL to your actual API endpoint
+      .then(response => response.json())
+      .then(data => setCategories(data))
+      .catch(error => console.error('Error fetching categories:', error));
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
-  
   return (
     <form onSubmit={handleSubmit} className="event-form">
       <h2>Create New Event</h2>
@@ -57,20 +66,26 @@ function EventForm({ onSubmit, onCancel }) {
         onChange={handleChange}
         required
       />
-      <input
-        type="text"
+      {/* Dropdown for categories */}
+      <select
         name="category"
-        placeholder="Category"
         value={formData.category}
         onChange={handleChange}
         required
-      />
+      >
+        <option value="">Select a Category</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
+      </select>
       <input
         type="datetime-local"
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        max = {formData.endTime}
+        max={formData.endTime}
         required
       />
       <input
@@ -78,7 +93,7 @@ function EventForm({ onSubmit, onCancel }) {
         name="endTime"
         value={formData.endTime}
         onChange={handleChange}
-        min = {formData.startTime}
+        min={formData.startTime}
         required
       />
       <div className="form-buttons">

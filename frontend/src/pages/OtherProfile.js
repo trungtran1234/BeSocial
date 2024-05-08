@@ -25,7 +25,7 @@ function UserProfile({ token: initialToken }) {
         const fetchData = async () => {
             const headers = { Authorization: `Bearer ${token}` };
             try {
-                const profileResponse = await axios.get(`http://localhost:5000/profile/${userId}`, { headers });
+                const profileResponse = await axios.get(`http://localhost:3001/profile/${userId}`, { headers });
                 if (profileResponse.data.redirectTo) {
                     navigate(profileResponse.data.redirectTo, { replace: true });
                 } else {
@@ -33,7 +33,7 @@ function UserProfile({ token: initialToken }) {
                     setUsername(profileResponse.data.username);
                 }
     
-                const followStatusResponse = await axios.get(`http://localhost:5000/following/${userId}`, { headers });
+                const followStatusResponse = await axios.get(`http://localhost:3001/following/${userId}`, { headers });
                 setIsFollowing(followStatusResponse.data.isFollowing);
                 console.log(followStatusResponse.data.isFollowing);
             } catch (error) {
@@ -46,7 +46,7 @@ function UserProfile({ token: initialToken }) {
 
     const toggleFollow = async () => {
         const headers = { Authorization: `Bearer ${token}` };
-        const url = `http://localhost:5000/${isFollowing ? 'unfollow' : 'follow'}/${userId}`;
+        const url = `http://localhost:3001/${isFollowing ? 'unfollow' : 'follow'}/${userId}`;
         try {
             await axios.post(url, {}, { headers });
             setIsFollowing(!isFollowing);
