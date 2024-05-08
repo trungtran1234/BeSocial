@@ -177,6 +177,7 @@ app.get('/events', authenticateToken, (req, res) => {
         JOIN categories c ON e.category_id = c.id
         LEFT JOIN bookmark eb ON e.id = eb.event_id AND eb.user_id = ?
         LEFT JOIN event_following ef ON e.id = ef.event_id AND ef.user_id = ?
+        WHERE ef.user_id IS NULL
     `, [userId, userId], (err, results) => {
         if (err) {
             console.error('Error retrieving events:', err);
