@@ -106,7 +106,6 @@ function BookmarkedEvents({ token: initialToken }) {
               event={event}
               onUnbookmark={() => handleUnbookmark(event.id)}
               showUnbookmarkButton={true}
-              showGuestButton={true}
               showFollowButton={!event.isAttending}
               showUnFollowButton={event.isAttending}
               onFollow={() => handleFollowEvent(event.id)}

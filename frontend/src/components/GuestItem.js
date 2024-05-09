@@ -19,9 +19,8 @@ function GuestItem({ guest, currentUserID }) {
       <div className="guest-item">
         <h4>
             <img src={profileIcon} alt="Profile" className="profileIcon" onClick={() => navigate(`/profile/${guest.id}`)} />
-            <span onClick={() => navigate(`/profile/${guest.id}`)} style={{ cursor: 'pointer' }}>{guest.id}</span>
+            <span onClick={() => navigate(`/profile/${guest.id}`)} style={{ cursor: 'pointer' }}>{guest.username}</span>
         </h4>
-        <h3>{guest.username}</h3>
       </div>
     );
   }

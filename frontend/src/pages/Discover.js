@@ -102,8 +102,7 @@ function Discover({ token: initialToken }) {
             onBookmark={() => handleBookmarkEvent(event.id)}
             onUnbookmark={() => handleUnbookmarkEvent(event.id)}
             showBookmarkButton={!event.isBookmarked}
-            showUnbookmarkButton={event.isBookmarked}
-            showGuestButton={true} />)
+            showUnbookmarkButton={event.isBookmarked}/>)
           )}
         </div>
       </div>

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../css/taskbar.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import profileIcon from '../css/images/profileIcon.png'; // Ensure the path is correct
+import profileIcon from '../css/images/profileIcon.png';
+import logo from '../css/images/logo.png';
 
 function Taskbar({ token: initialToken }) {
     const [token, setToken] = useState(initialToken || localStorage.getItem('authToken'));
@@ -14,7 +15,6 @@ function Taskbar({ token: initialToken }) {
         setToken(null);
         navigate('/login');
         window.location.reload();
-         // Changed to use navigate for SPA behavior
     };
 
     const handleNavigation = (path) => {
@@ -29,7 +29,7 @@ function Taskbar({ token: initialToken }) {
         <div className="taskbarContainer">
             <div className="innerTaskBar">
                 <div className="taskBarLeft">
-                    [Insert BeSocial Logo]
+                    <img src={logo} alt="logo" className="logo"/>
                 </div>
                 <div className="taskBarCenter">
                     <button onClick={() => handleNavigation('/')} className={`navButton ${isActive('/')}`}>Home</button>

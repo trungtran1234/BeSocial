@@ -73,8 +73,8 @@
 }
 
 .profileIcon {
-    height: 2.3vw;
-    width: 2.3vw; 
+    height: 3vw;
+    width: 3vw; 
     border-radius: 50%;  
     cursor: pointer; 
     margin-right: 1vw; 
@@ -96,4 +96,10 @@
     background-color: #c9302c;
 }
 
+.logo {
+    height: 10vh;
+    width: 10vh;
+    margin-right: 1vw;
+    margin-top: 1vh;
+}
 

@@ -84,7 +84,6 @@ function UserWall({ token: initialToken  }) {
                             key={event.id}
                             event={event}
                             onDelete={() => handleDeleteEvent(event.id)}
-                            showGuestButton={true}
                             showDeleteButton={true}
                         />
                     ))
