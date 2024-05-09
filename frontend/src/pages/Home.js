@@ -26,7 +26,7 @@ function Homepage({ token: initialToken }) {
         </div>
       </div>
       <div className='upcomingEventsContainer'>
-              <h1>Boxes that redirect to main features</h1>
+              
       </div>
     </div>
   );

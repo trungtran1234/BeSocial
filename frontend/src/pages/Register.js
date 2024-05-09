@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import '../css/register.css';
+import logo from '../css/images/logo.png';
 
 
 const RegistrationForm = () => {
@@ -43,7 +44,7 @@ const RegistrationForm = () => {
   return (
     <div className="register-container">
       <div className = "register-logo">
-          Register Now!
+        <img src={logo} alt="logo" className="register-logo-button"/>
       </div>
       <div className="register-box">
         <h1>Sign Up</h1>

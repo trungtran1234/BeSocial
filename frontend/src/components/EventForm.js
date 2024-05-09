@@ -59,7 +59,7 @@ const today = getCurrentDateTime();
         onChange={handleChange}
         required
       />
-      <textarea
+      <textarea className = "description-box"
         name="description"
         placeholder="Description"
         value={formData.description}
@@ -82,15 +82,15 @@ const today = getCurrentDateTime();
         onChange={handleChange}
         required
       />
-      <div>
-        <label htmlFor="category_id">Category:</label>
+      <div className = "test">
+        <label htmlFor="category_id"></label>
         <select
           name="category_id"
           value={formData.category_id}
           onChange={handleChange}
           required
         >
-          <option value="">Select a Category</option>
+          <option value="">Category</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>{category.name}</option>
           ))}

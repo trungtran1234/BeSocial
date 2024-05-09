@@ -37,19 +37,8 @@
     align-items: center;
 }
 
-.searchButton {
-    margin-bottom:2vh;
-    font-size: 1vw;
-    width: 90%;
-    height: 85%;
-    border-radius: 1.2vh;
-    border: solid black 0.11vw;
-    cursor: pointer;
-    background-color: rgb(185, 212, 224);
-}
-
 .searchButton:hover {
-    background-color: rgb(104, 157, 182);
+    background-color: rgb(68, 109, 128);
 }
 
 .popup_search {
@@ -64,6 +53,18 @@
     padding: 20px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
     border-radius: 10px;
+}
+
+.searchButton {
+    background-color: rgb(97, 154, 180);
+    color: white;
+    border: none;
+    padding: 1rem 5rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 0.2rem 1.5rem;
+    font-size: 0.9vw;
 }
 
   

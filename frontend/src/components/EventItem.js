@@ -40,8 +40,8 @@
           </div>
           <div className = "event-item-bottom">
             <h3>{event.title}</h3>
-              <p>{event.description}</p>
-              <p>
+              <p className = "description">{event.description}</p>
+              <p >
                 <strong>Location: </strong> {event.location}
               </p>
               <p>

@@ -40,7 +40,7 @@ function Taskbar({ token: initialToken }) {
                     <button onClick={() => handleNavigation('/bookmarked_events')} className={`navButton ${isActive('/bookmarked_events')}`}>Bookmarked Events</button>
                 </div>
                 <div className="taskBarRight">
-                    <img src={profileIcon} alt="Profile" className="profileIcon" onClick={() => navigate('/profile')} />
+                    <img src={profileIcon} alt="Profile" className="profileIconTask" onClick={() => navigate('/profile')} />
                     <button className="logoutButton" onClick={handleLogout}>Logout</button>
                 </div>
             </div>

@@ -31,6 +31,17 @@
 }
 
 .createButton:hover {
-    background-color: rgb(63, 102, 27);
+    background-color: rgb(81, 131, 35);
+}
+
+.createButton {
+    background-color: rgb(118, 187, 54);
     color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 0.2rem 1.5rem;
+    font-size: 0.9vw;
 }
