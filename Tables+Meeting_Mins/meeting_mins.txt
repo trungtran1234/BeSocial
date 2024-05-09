@@ -1,0 +1,24 @@
+3/28/2024 8:30 P.M.:
+    Attendance: Everyone
+    Subject: Brainstorming project ideas for proposal
+    Key Points:
+        . Discussed potential stack
+        . Web host or local host?
+        . Division of work
+
+
+5/7/2024 9:30 P.M.:
+    Attendance: Everyone
+    Subject: Tackling implementing indexing
+    Key Points:
+        . What is the best way to use it?
+        . Decided to implement hashing and use MySQL's built in BTREE indexing
+
+
+5/9/2024 1:30 P.M.:
+    Attendance: Everyone
+    Subject: Finalizing slides and presentations
+    Key Points:
+        . How to show off indexing
+        . Who is presenting?
+        . Fixing ER diagram issue
