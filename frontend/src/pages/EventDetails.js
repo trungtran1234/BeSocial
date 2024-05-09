@@ -19,15 +19,6 @@ const EventDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/users/${event.host_user_id}`);
-        setHostUsername(response.data.username);
-      } catch (error) {
-        console.error('Failed to fetch host username:', error);
-      }
-    };
-    fetchUsername();
 
     const fetchEventDetails = async () => {
       try {
@@ -57,7 +48,19 @@ const EventDetails = () => {
     };
 
     fetchEventDetails();
-  }, [id, event]);
+  }, [id]);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/users/${event.host_user_id}`);
+        setHostUsername(response.data.username);
+      } catch (error) {
+        console.error('Failed to fetch host username:', error);
+      }
+    };
+    fetchUsername();
+  }, [event]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
