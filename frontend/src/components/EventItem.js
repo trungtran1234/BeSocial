@@ -3,6 +3,8 @@
   import '../css/event_item.css';
   import { Link, useNavigate } from 'react-router-dom';
   import profileIcon from '../css/images/profileIcon.png';
+  import { FaBookmark } from "react-icons/fa";
+  import { FaRegBookmark } from "react-icons/fa";
 
     function EventItem({ event, showGuestButton, onFollow, onDelete, onUnfollow, showDeleteButton, showFollowButton, showUnFollowButton, showBookmarkButton, showUnbookmarkButton, onBookmark, onUnbookmark, currentUserID }) {
       const navigate = useNavigate();
@@ -55,20 +57,20 @@
                 <strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}
               </p>
               {showDeleteButton && (
-                      <button onClick={() => onDelete()}>Delete</button>
+                      <button className="deleteButton" onClick={() => onDelete()}>Delete</button>
                   )}
               {showFollowButton && (
-                      <button onClick={() => onFollow()}>Attend</button>
+                      <button className="attendButton" onClick={() => onFollow()}>Attend</button>
                   )}
               {showUnFollowButton && (
-                      <button onClick={() => onUnfollow()}>Unattend</button>
+                      <button className="unattendButton" onClick={() => onUnfollow()}>Unattend</button>
                   )} 
-                <button onClick={() => navigate(`/event/${event.id}`)}>View Event</button>
+                <button className="viewEventButton" onClick={() => navigate(`/event/${event.id}`)}>View Event</button>
                 { showBookmarkButton && (
-                  <button onClick={() => onBookmark()}>Bookmark</button>
+                  <button className="bookmark" onClick={() => onBookmark()}><FaRegBookmark/></button>
               )}
               { showUnbookmarkButton && (
-                  <button onClick={() => onUnbookmark()}>Unbookmark</button>
+                  <button className="bookmark" onClick={() => onUnbookmark()}><FaBookmark/> </button>
               )}
                 {showGuestButton && (
                       <button onClick={() => navigate(`/guest_list/${event.id}`)}>Guest List</button>
