@@ -40,16 +40,29 @@ Ashton Headley,
 * Sorted the events on all pages by date, moving those with potential errors (designated by NULL) to the back.
 * Wrote the README.
 * Helped brainstorm details for presentation slides.
-* Formatted Final Report document and created table of contents.
 * 
 ## Tri Nguyen:
 * Helped brainstorm details for presentation slides.
-* Wrote ER diagram
+* Draw the ER diagram
+* Record the demo
+* Implemented the user log out
+* Implemented the hash indexing method for events and users table
+* Created and implemented the endpoint for events to fetch guest list (list of attending users)
+* Created the UserWall.js (Event Hosted page) 
+* Created the EventFollowing.js (Event Attended page)
+* Created and implemented the endpoint for the Event Hosted Page to fetch user's hosting events
+* Created and implemented the endpoint to enable users to delete hosted events in the Event Hosted page
+* Created and implemented the endpoints to enable users to attend events and unattend events
+* Created and implemented the endpoint to enable the Event Attending page to fetch events users are attending
+* Add to the eventItem component with attend, delelete, and guestList feature
 ## Trung Tran:
+* Intialized the environment
+* Created and implement the endpoint for user registering and user login
+* Implment the authentication system for user login
 * Created event creation form, event object, and event SQL table
 * Created event wall for following users' events
 * Created user profile with following feature along with following and follower list
-* Created bookmark feature for events
+* Created Book mark page as well as endpoints for user to book mark events
 * Created event details page
 * Created event comment section and like feature
 * Helped brainstorm details for presentation slides.
@@ -63,4 +76,3 @@ Ashton Headley,
 * Worked on event_category: created the table on MySQL and helped write backend code to link it to the event_form.
 * Set up presentation slides.
 * Helped brainstorm details for presentation slides.
-* 
