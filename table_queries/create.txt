@@ -14,7 +14,6 @@ CREATE TABLE events (
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     host_user_id INT,
-    host_username VARCHAR (255) NOT NULL,
     FOREIGN KEY (host_user_id) REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -66,6 +65,15 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE comment_likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    UNIQUE KEY unique_like (comment_id, user_id),
+    FOREIGN KEY (comment_id) REFERENCES comments(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 CREATE TABLE bookmark (
     user_id INT,         
     event_id INT,   
@@ -73,6 +81,11 @@ CREATE TABLE bookmark (
     PRIMARY KEY (user_id, event_id),
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+CREATE TABLE categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE events_id_hash_index(
@@ -84,3 +97,4 @@ CREATE TABLE users_id_hash_index(
     hashed_value binary(32),
     original varchar(255),
 );
+
