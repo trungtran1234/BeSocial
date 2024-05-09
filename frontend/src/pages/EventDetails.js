@@ -122,13 +122,13 @@ const EventDetails = () => {
         <div className="eventDetailsContainer">
           <h1>Event Details:</h1>
           <h2>{event.title}</h2>
-          <p>Hosted by: {hostUsername}</p>
-          <p>Description: {event.description}</p>
-          <p>Location: {event.location}</p>
-          <p>Start Time: {new Date(event.start_time).toLocaleString()}</p>
-          <p>End Time: {new Date(event.end_time).toLocaleString()}</p>
-          <p>Capacity: {event.capacity}</p>
-          <p>Category: {event.category_name || 'No Category'}</p>
+          <p><strong>Hosted by:</strong> {hostUsername}</p>
+          <p className = "description_box"><strong>Description:</strong> {event.description}</p>
+          <p><strong>Location:</strong> {event.location}</p>
+          <p><strong>Start Time:</strong> {new Date(event.start_time).toLocaleString()}</p>
+          <p><strong>End Time:</strong> {new Date(event.end_time).toLocaleString()}</p>
+          <p><strong>Capacity:</strong> {event.capacity}</p>
+          <p><strong>Category:</strong> {event.category_name || 'No Category'}</p>
         </div>
         <div className="eventGuestListContainer">
           <h1>Guest List:</h1>

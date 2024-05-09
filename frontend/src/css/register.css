@@ -6,7 +6,10 @@
     height: 100vh; 
     width: 100vw;
     background-color: #e3e3e3;
-    background-image: url(images/cool-background.png);
+    background-image: url(images/new-background.jpg);
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center;
   }
 
   .register-logo{
@@ -78,5 +81,13 @@
     color: red;
     font-weight: bold;
     margin-bottom: 1.4vh;
+  }
+
+  .register-logo-button{
+    height: 43vw;
+    width: 53.5vw;
+    border-radius: 50%; 
+    margin-right: 1vw;
+    margin-top: 1vh;
   }
   

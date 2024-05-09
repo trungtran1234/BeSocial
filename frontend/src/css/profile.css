@@ -30,17 +30,46 @@
 }
 
 .modal-content {
-    background: white;
+    background: rgb(126, 174, 189);
     padding: 20px;
     border-radius: 5px;
-    max-height: 70%;
-    overflow: auto;
-    width: 300px;
+    min-height: 50%;
+    min-width: 20%;
+    max-height: 50%;
+    max-height: 20%;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+    overflow-y: auto;
+    display: flex;
+    justify-content: left;
+    flex-direction: column;
+    
+}
+
+.modal-inner-content{
+    background: rgb(210, 226, 231);
+    min-height: 39vh;
+    max-height: 39vh;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    
+    
 }
 
 .modal-list {
-    max-height: 200px;
     overflow-y: auto;
+    padding-right: 12vw;
+    
+}
+
+.modal-close{
+    background-color: rgb(218, 214, 214);
+    width: 10vw;
+    margin-left: 5vw;
+    margin-top: 1vh;
 }
 
 .eventsListed {
@@ -68,16 +97,16 @@
 }
 
 .profileButton {
-    height: 63%;
-    width: 12%;
-    margin: 0% 1.5%;
-    margin-bottom:2vh;
-    font-size: 1vw;
-    border-radius: 1.2vh;
-    border: solid black 0.11vw;
+    background-color: #2c8c81;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
     cursor: pointer;
-    background-color: rgb(185, 212, 224);
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 0.2rem 1.5rem;
 }
+
 
 .profileButton:hover {
     background-color: rgb(104, 157, 182);
