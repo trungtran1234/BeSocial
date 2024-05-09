@@ -104,7 +104,6 @@ function EventWall({ token: initialToken }) {
             onUnbookmark={() => handleUnbookmarkEvent(event.id)}
             showBookmarkButton={!event.isBookmarked}
             showUnbookmarkButton={event.isBookmarked}
-            showGuestButton={true}
             />)
           )}
         </div>
