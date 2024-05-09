@@ -32,6 +32,8 @@ Ashton Headley,
    - BeSocial/frontend : npm start
 9. View the application from an internet browser using the URL: http://localhost:3000/
 
+Copies of the SQL Tables and Meeting Minutes are located in a folder in the BeSocial directory. 
+
 # Division of Work
 ## Ryan Ogrey:
 * Implemented the frontend HTML/CSS styling for all aspects of the application.
@@ -40,7 +42,6 @@ Ashton Headley,
 * Sorted the events on all pages by date, moving those with potential errors (designated by NULL) to the back.
 * Wrote the README.
 * Helped brainstorm details for presentation slides.
-* 
 ## Tri Nguyen:
 * Helped brainstorm details for presentation slides.
 * Draw the ER diagram
@@ -71,8 +72,9 @@ Ashton Headley,
 * Sourced images to be used for various buttons and backgrounds on the frontend
 * Designed and wrote all presentation slides.
 * Presented the slide portion of the presentation.
-* 
 ## Ashton Headley:
 * Worked on event_category: created the table on MySQL and helped write backend code to link it to the event_form.
 * Set up presentation slides.
 * Helped brainstorm details for presentation slides.
+
+## Details on division of final report work are present within the report document itself.
