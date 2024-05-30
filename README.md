@@ -14,17 +14,17 @@ Ashton Headley,
 2. Install git
 3. Download MySQL
 3. Setup Database with MySQL by creating a new connection in MySQL Workbench with the following details
-   - Hostname: socialdb.ct26ske6krnv.us-west-1.rds.amazonaws.com
-   - Port: 3306
-   - Username: admin
-   - Pass: adminpass
+   - Hostname: <Your_Hostname>
+   - Port: <Your_Port>
+   - Username: <Your_Username>
+   - Pass: <Your_password>
 4. Clone this repository in a new directory (git clone)
 5. Create .env folder inside BeSocial directory. Include the following text inside that folder. <br>
-   DB_HOST=socialdb.ct26ske6krnv.us-west-1.rds.amazonaws.com <br>
-   DB_USER=admin <br>
-   DB_PASSWORD=adminpass <br>
-   DB_NAME=db <br>
-   SECRET_KEY=x3TJwulwI9 <br>
+   DB_HOST=<Your_Hostname> <br>
+   DB_USER=<Your_username> <br>
+   DB_PASSWORD=<Your_password> <br>
+   DB_NAME=<Your_Schema> <br>
+   SECRET_KEY=<Your_secret> <br>
 6. Go to BeSocial/backend and type "npm i"
 7. Go to BeSocial/frontend and type "npm i"
 8. Create two seperate terminal windows within BeSocial and type these commands in the following directories.
